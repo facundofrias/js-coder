@@ -1,11 +1,13 @@
 console.log("¡Te damos la bienvenida a la Calculadora de propinas!");
 
+// Declaración de variables
 let porcentajePropina,
     cantidadPersonas,
     totalPropina = 0,
     totalCuenta = 0,
     flag = false;
 
+// Main
 while(flag === false) {
   porcentajePropina = prompt("Ingresar porcentaje de propina.");
   flag = validarNumero(porcentajePropina);
