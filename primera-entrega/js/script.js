@@ -1,64 +1,46 @@
 alert("¡Te damos la bienvenida a la Calculadora de propinas!");
 
-// Declaración clase
-class Propina {
-  constructor(porcentajePropina, cantidadPersonas, totalPropina = 0, totalCuenta = 0, montosComensales) {
-    this.porcentajePropina = parseInt(porcentajePropina);
-    this.cantidadPersonas = parseInt(cantidadPersonas);
-    this.totalPropina = parseFloat(totalPropina);
-    this.totalCuenta = parseFloat(totalCuenta);
-    this.montosComensales = montosComensales;
-  } 
-
-  // Métodos
-  // Calcula el monto de propina que la persona debe poner
-  calcularPropinaIndividual(montoPersona) {
-    return Number(montoPersona * (this.porcentajePropina / 100)).toFixed(2);
-  }
-
-  // Calcula los montos totales de la cuenta y propina
-  calcularPropinaTotalYCuenta() {
-    let flag = false;
-    for (let i=0; i < this.montosComensales.length; i++) {
-      let p = i+1;
-      this.montosComensales[i] = prompt(`Ingresar monto de persona ${p}:`);
-      flag = validarNumero(this.montosComensales[i]);
-      if (flag === false) {
-        i--;
-      }
-        else {
-          this.totalCuenta = Number(this.totalCuenta) + Number(this.montosComensales[i]);
-          this.totalPropina = Number(this.totalPropina) + Number(this.calcularPropinaIndividual(this.montosComensales[i]));
-          alert(
-            `Monto persona ${p}: $ ${Number(this.montosComensales[i]).toFixed(2)} - Porcentaje propina: %${Number(this.porcentajePropina).toFixed(2)} - Propina: $ ${this.calcularPropinaIndividual(this.montosComensales[i])}`
-          );
-        }
-    }
-  }
-}
-
-// Main
 do {
-  // Declaración de objeto Propina
-  let propina = new Propina,
+  // Declaración de variables
+  let porcentajePropina,
+      cantidadPersonas,
+      totalPropina = 0,
+      totalCuenta = 0,
+      comensales,
       flag = false;
 
+  // Main
   while (flag === false) {
-    propina.porcentajePropina = prompt("Ingresar porcentaje de propina.");
-    flag = validarNumero(propina.porcentajePropina);
+    porcentajePropina = prompt("Ingresar porcentaje de propina.");
+    flag = validarNumero(porcentajePropina);
   }
 
   flag = false;
   while (flag === false) {
-    let cantidadPersonas = prompt("Ingresar cantidad de comensales.");
+    cantidadPersonas = prompt("Ingresar cantidad de comensales.");
     flag = validarNumeroEntero(cantidadPersonas);
     if (flag === true) {
-      propina.montosComensales = Array.apply( null, { length: cantidadPersonas } );
+      comensales = [cantidadPersonas]; 
     }
   }
 
-  propina.calcularPropinaTotalYCuenta();
-  alert(`Monto total: $${Number(propina.totalCuenta).toFixed(2)}  -  Propina total: $${Number(propina.totalPropina).toFixed(2)}`);
+  flag = false;
+  for (i = 1; i <= cantidadPersonas; i++) {
+    let montoPersona = prompt(`Ingresar monto de persona ${i}:`),
+      flag = validarNumero(montoPersona);
+    if (flag === false) {
+      i--;
+    } else {
+      totalCuenta = Number(totalCuenta) + Number(montoPersona);
+      alert(`Total cuenta: ${totalCuenta}`);
+      totalPropina = Number(totalPropina) + Number(calcularPropina(montoPersona, porcentajePropina));
+      alert(
+        `Monto persona ${i}: ${Number(montoPersona).toFixed(2)} - Porcentaje propina: %${Number(porcentajePropina).toFixed(2)} - Propina: ${calcularPropina(montoPersona,porcentajePropina)}`
+      );
+    }
+  }
+
+  alert(`Monto total: ${Number(totalCuenta).toFixed(2)}  -  Propina total: ${Number(totalPropina).toFixed(2)}`);
 
   flag = false;
   salida = prompt(
@@ -87,4 +69,9 @@ function validarNumeroEntero(valor) {
   } else {
     return true;
   }
+}
+
+// Calcula el monto de propina que la persona debe poner
+function calcularPropina(monto, porcentaje) {
+  return Number(monto * (porcentaje / 100)).toFixed(2);
 }
