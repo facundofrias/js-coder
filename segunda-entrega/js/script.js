@@ -30,7 +30,7 @@ class Propina {
           this.totalCuenta = Number(this.totalCuenta) + Number(this.montosComensales[i]);
           this.totalPropina = Number(this.totalPropina) + Number(this.calcularPropinaIndividual(this.montosComensales[i]));
           alert(
-            `Monto persona ${p}: $ ${toFixedSinCeros(this.montosComensales[i])} - Porcentaje propina: %${toFixedSinCeros(this.porcentajePropina)} - Propina: $ ${toFixedSinCeros(this.calcularPropinaIndividual(this.montosComensales[i]))}`
+            `Monto persona ${p}: $ ${sinCeros(this.montosComensales[i])} - Porcentaje propina: %${sinCeros(this.porcentajePropina)} - Propina: $ ${sinCeros(this.calcularPropinaIndividual(this.montosComensales[i]))}`
           );
         }
     }
@@ -62,7 +62,7 @@ do {
   //alert(`Monto total: $${Number(propina.totalCuenta).toFixed(2)}  -  Propina total: $${Number(propina.totalPropina).toFixed(2)}`);
 
 
-  alert(`Monto total: $${toFixedSinCeros(propina.totalCuenta)}  -  Propina total: $${toFixedSinCeros(propina.totalPropina)}`);
+  alert(`Monto total: $${sinCeros(propina.totalCuenta)}\nPropina total: $${sinCeros(propina.totalPropina)}`);
 
   flag = false;
   salida = prompt(
