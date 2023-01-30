@@ -1,0 +1,35 @@
+/* Ocultar flechas input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+
+  /* Acorta el ancho del campo*/
+  width: 55px;
+}
+
+.datos-iniciales {
+  display: grid;
+  grid-template-columns: 40% 40% 20%;
+}
+
+.field-inicial,
+.field {
+  margin: 7px 0;
+}
+
+.totales,
+.montos {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.totales {
+  margin-top: 1.5rem;
+}
