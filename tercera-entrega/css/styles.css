@@ -1,3 +1,7 @@
+body {
+  background-color: #cacaca;
+}
+
 /* Ocultar flechas input */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
@@ -12,6 +16,21 @@ input[type=number] {
 
   /* Acorta el ancho del campo*/
   width: 55px;
+}
+
+.datos-personales {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-datos {
+  margin-bottom: 14px;
+  width: 14rem;
+}
+
+.btn-registro {
+  width: 5.5rem;
 }
 
 .datos-iniciales {
