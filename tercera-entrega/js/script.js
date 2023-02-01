@@ -12,12 +12,14 @@ class Cliente {
 
 class Propina {
   constructor(
+    fecha = new Date(),
     porcentajePropina,
     cantidadPersonas,
     totalPropina = 0,
     totalCuenta = 0,
-    montosComensales
+    montosComensales = []
   ) {
+    this.fecha = fecha;
     this.porcentajePropina = parseInt(porcentajePropina);
     this.cantidadPersonas = parseInt(cantidadPersonas);
     this.totalPropina = parseFloat(totalPropina);
@@ -26,54 +28,41 @@ class Propina {
   }
 
   // Métodos
-  // Calcula el monto de propina que la persona debe poner
-  calcularPropinaIndividual(montoPersona) {
-    return Number(montoPersona * (this.porcentajePropina / 100)).toFixed(2);
-  }
 
-  // Calcula los montos totales de la cuenta y propina
-  calcularPropinaTotalYCuenta() {
-    let flag = false;
-    for (let i = 0; i < this.montosComensales.length; i++) {
-      let p = i + 1;
-      this.montosComensales[i] = prompt(`Ingresar monto de persona ${p}:`);
-      flag = validarNumero(this.montosComensales[i]);
-      if (flag === false) {
-        i--;
-      } else {
-        this.totalCuenta =
-          Number(this.totalCuenta) + Number(this.montosComensales[i]);
-        this.totalPropina =
-          Number(this.totalPropina) +
-          Number(this.calcularPropinaIndividual(this.montosComensales[i]));
-        alert(
-          `Monto persona ${p}: $ ${sinCeros(
-            this.montosComensales[i]
-          )} - Porcentaje propina: %${sinCeros(
-            this.porcentajePropina
-          )} - Propina: $ ${sinCeros(
-            this.calcularPropinaIndividual(this.montosComensales[i])
-          )}`
-        );
-      }
-    }
+  // Formatea la fecha
+  formatearFecha() {
+    const yyyy = this.fecha.getFullYear();
+    let mm = this.fecha.getMonth() + 1,
+        dd = this.fecha.getDate(),
+        hora = this.fecha.getHours(),
+        minutos = this.fecha.getMinutes(),
+        segundos = this.fecha.getSeconds();
+
+    // Agrega '0' a días, meses, horas, minutos y segundos menores que 10
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    if (hora < 10) hora = '0' + hora;
+    if (minutos < 10) minutos = '0' + minutos;
+    if (segundos < 10) segundos = '0' + segundos;
+
+    // Devuelve la fecha formateada. Ejemplo de salida: 31/01/2023 19:27:07
+    return (`${dd}/${mm}/${yyyy} ${hora}:${minutos}:${segundos}`);
   }
 }
 
 // MAIN
 
+// Verifica si la existencia de un cliente para cargar sus datos
 existeCliente();
-
 // Declaración variables
-const propina = new Propina(),
-  porcentajePropina = document.getElementById("porcentaje-propina"),
-  cantidadComensales = document.getElementById("cantidad-comensales"),
-  btnSiguiente = document.getElementById("btn-mostrar-comensales"),
-  contenedorPrincipal = document.getElementById("contenedor-principal")
-  btnRegistro = document.getElementById("btn-registro");
+let porcentajePropina = document.getElementById("porcentaje-propina"),
+      cantidadComensales = document.getElementById("cantidad-comensales"),
+      btnSiguiente = document.getElementById("btn-mostrar-comensales"),
+      contenedorPrincipal = document.getElementById("contenedor-principal"),
+      btnRegistro = document.getElementById("btn-registro");
+
 
 // EVENTOS
-
 // Se dispara cuando se establecieron valores en campos de porcentaje propina y cantidad de comensales
 btnSiguiente.addEventListener("click", validarYGenerarCampos);
 
@@ -97,9 +86,11 @@ function validarRegistro() {
 
 // Almacena cliente
 function almacenarCliente(nombre, apellido, dni) {
-  let cliente = new Cliente(nombre, apellido, dni);
+  let cliente = new Cliente(nombre, apellido, dni),
+      textoBienvenida = document.getElementById("texto-bienvenida");
   localStorage.setItem('cliente', JSON.stringify(cliente));
-  alert(`¡Te damos la bienvenida ${nombre}!`);
+  textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
+  document.getElementById("texto-datos-personales").innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés cambiar tus datos personales; o utilizar la app de manera anónima haciendo clic <a href="" id="anonima">acá</a>.`;
 }
 
 // FUNCIONES
@@ -108,7 +99,12 @@ function almacenarCliente(nombre, apellido, dni) {
 function existeCliente() {
   if (localStorage.getItem('cliente') !== null) {
     completarDatosCliente();
+    existenPropinas();
   }
+}
+
+// Verifica si existen propinas
+function existenPropinas() {
 }
 
 // Completa los datos del cliente en el formulario 
@@ -121,11 +117,11 @@ function completarDatosCliente() {
   document.getElementById("dni").value = c.dni;
   
   document.getElementById("texto-bienvenida").textContent = `¡Te damos la bienvenida nuevamente, ${c.nombre}!`;
-  document.getElementById("texto-datos-personales").innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés cambiar tus datos personales o utilizar la app de manera <a href="" id="anonima">anonima</a>.`;
+  document.getElementById("texto-datos-personales").innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés cambiar tus datos personales; o utilizar la app de manera anónima haciendo clic <a href="" id="anonima">acá</a>.`;
   document.getElementById("btn-registro").textContent = "Cambiar";
   
   // Evento que se dispara cuando se hace clic sobre "anónima"
-  const anonima = document.getElementById("anonima").addEventListener("click", limpiarStorage);
+  document.getElementById("anonima").addEventListener("click", limpiarStorage);
 }
 
 // Limpia el local storage permitiendo que la app tenga su html nativo
@@ -199,7 +195,6 @@ btnCalcularPropina.addEventListener("click", validarMontosComensales);
 // Funciones de utilidad
 
 // Valida el correcto ingreso de los montos de cada comensal
-
 function validarMontosComensales() {
   let montosComensales = document.getElementsByClassName("field"),
       nombresDatosInvalidos = [],
@@ -224,19 +219,64 @@ function validarMontosComensales() {
 
 // Calcula el monto total a pagar y la propina tota
 function calcularMontoTotalYPropina() {
-  let propinaComensal;
-  propina.montosComensales = document.getElementsByClassName("monto-propinas");
+  const propina = new Propina();
+  let propinaComensal,
+      montosComensalesHTML = document.getElementsByClassName("monto-propinas");
+  propina.fecha = propina.formatearFecha();
+  propina.cantidadPersonas = cantidadComensales.value;
   propina.porcentajePropina = Number(porcentajePropina.value);
-  for (let i = 0; i < propina.montosComensales.length; i++) {
-    propina.totalCuenta = Number(propina.totalCuenta) + Number(propina.montosComensales[i].value);
-    propinaComensal = Number(propina.montosComensales[i].value) / propina.porcentajePropina;
-    propina.montosComensales[i].nextElementSibling.textContent = `Propina: $${propinaComensal}`;
+  for (let i = 0; i < montosComensalesHTML.length; i++) {
+    propina.totalCuenta = Number(propina.totalCuenta) + Number(montosComensalesHTML[i].value);
+    propinaComensal = Number(montosComensalesHTML[i].value) / propina.porcentajePropina;
+    propina.montosComensales[i] = montosComensalesHTML[i].value;
+    montosComensalesHTML[i].nextElementSibling.textContent = `Propina: $${propinaComensal}`;
   }
   propina.totalPropina = sinCeros(Number(propina.totalCuenta) / propina.porcentajePropina);
   document.getElementById("monto-total").textContent = `Monto total a pagar: $${propina.totalCuenta}`;
   document.getElementById("propina-total").textContent = `Propina total: $${propina.totalPropina}`;
+  almacenarPropina(propina);
 }
 
+// Almacena propina asociada a cliente
+function almacenarPropina(propina) {
+  let propinas = [];
+  if (localStorage.getItem('cliente') !== null) {
+    if(localStorage.getItem("propinas") !== null) {    
+      propinas = JSON.parse(localStorage.getItem('propinas'));      
+      // Si la cantidad de propinas almacenadas es igual a 5, borra la útima
+      if (propinas.length == 5) {
+        propinas.pop();
+        }
+      }
+    propinas.push(propina);
+    propinas.reverse(propinas.fecha);
+    localStorage.setItem("propinas", JSON.stringify(propinas));
+  }
+  mostrarUltimasPropinas(propinas);
+}
+
+// Muestra las últimas 5 propinas del cliente en la interfaz de la aplicación
+function mostrarUltimasPropinas(propinas) {
+  let historialPropinasHTML = `
+        <h4>Historial de propinas</h4>
+      `,
+      tableHTML = `
+          <table class="historial-propinas" id="customers">
+            <tr>
+              <th>Fecha</th>
+              <th>Cantidad de comensales</th>
+              <th>Monto total</th>
+              <th>Porcentaje propina</th>
+              <th>Monto propina</th>
+            </tr>
+          </table>
+        `;
+
+  for (let i = 0; i < propinas.length; i++) {
+    
+    
+  }
+}
 
 // Limpia el html dedicado a calcular propina
 function limpiarPropina() {
@@ -270,40 +310,3 @@ function validarNumeroEntero(valor) {
     return true;
   }
 }
-
-/*
-do {
-
-  // Declaración de objeto Propina
-  let propina = new Propina,
-      flag = false;
-
-  while (flag === false) {
-    propina.porcentajePropina = prompt("Ingresar porcentaje de propina.");
-    flag = validarNumero(propina.porcentajePropina);
-  }
-
-  flag = false;
-  while (flag === false) {
-    let cantidadPersonas = prompt("Ingresar cantidad de comensales.");
-    flag = validarNumeroEntero(cantidadPersonas);
-    if (flag === true) {
-      propina.montosComensales = new Array(Number(cantidadPersonas));
-    }
-  }
-
-  propina.calcularPropinaTotalYCuenta();
-  //alert(`Monto total: $${Number(propina.totalCuenta).toFixed(2)}  -  Propina total: $${Number(propina.totalPropina).toFixed(2)}`);
-
-
-  alert(`Monto total: $${sinCeros(propina.totalCuenta)}\nPropina total: $${sinCeros(propina.totalPropina)}`);
-
-  flag = false;
-  salida = prompt(
-    "Ingrese 1 si desea realizar un nuevo cálculo.\nIngrese 2 si desea salir."
-  );
-}  while (salida !== "2");
-
-
-
- */

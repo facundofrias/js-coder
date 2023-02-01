@@ -16,9 +16,49 @@
   <h1>CODERHOUSE - JavaScript</h1>
   <h2>Tercera pre-entrega</h2>
   <h3>Calculadora de propinas</h3>
-  <h3 id="texto-bienvenida">¡Te damos la bienvenida!</h3>
   <p>Calcula la propina individual de cada consumidor/a tomando como referencia un porcentaje inicial.</p>
-  <p id="texto-datos-personales">Si querés, podes ingresar tu nombre completo y DNI y así registraremos tu última propina <strong>(opcional)</strong>:</p>
+  <h3 id="texto-bienvenida">¡Te damos la bienvenida!</h3>
+  <!-- <h4>Historial de propinas</h4>
+  <table class="historial-propinas" id="customers">
+    <tr>
+      <th>Fecha</th>
+      <th>Cantidad de comensales</th>
+      <th>Monto total</th>
+      <th>Porcentaje propina</th>
+      <th>Monto propina</th>
+    </tr>
+    <tr>
+      <td>31/01/2023</td>
+      <td>30</td>
+      <td>$123456789</td>
+      <td>10%</td>
+      <td>$12345678.9</td>
+    </tr>
+    <tr>
+      <td>31/01/2023</td>
+      <td>30</td>
+      <td>$123456789</td>
+      <td>10%</td>
+      <td>$12345678.9</td>
+    </tr>
+    <tr>
+      <td>31/01/2023</td>
+      <td>30</td>
+      <td>$123456789</td>
+      <td>10%</td>
+      <td>$12345678.9</td>
+    </tr>
+    <tr>
+      <td>31/01/2023</td>
+      <td>30</td>
+      <td>$123456789</td>
+      <td>10%</td>
+      <td>$12345678.9</td>
+    </tr>
+  </table> -->
+  <p id="texto-datos-personales">Si querés, podés ingresar tus datos, así registraremos tu última propina
+    <strong>(opcional)</strong>:
+  </p>
   <div class="datos-personales">
     <label class="field__title">Nombre/s:</label>
     <input class="field-datos" type="text" id="nombre">
@@ -32,12 +72,11 @@
     <div class="datos-iniciales">
       <div class="field-inicial">
         <label class="field__title">Porcentaje propina:</label>
-        <input class="field-input" type="number" name="porcentaje-propina" id="porcentaje-propina"
-          autofocus>
+        <input class="field-input" type="number" name="porcentaje-propina" id="porcentaje-propina" autofocus value="10">
       </div>
       <div class="field-inicial">
         <label class="field__title">Cantidad de comensales:</label>
-        <input class="field-input" type="number" name="comensales" id="cantidad-comensales">
+        <input class="field-input" type="number" name="comensales" id="cantidad-comensales" value="1">
       </div>
       <div class="field-inicial">
         <button id="btn-mostrar-comensales">Siguiente</button>

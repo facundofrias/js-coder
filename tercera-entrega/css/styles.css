@@ -1,3 +1,6 @@
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
 body {
   background-color: #cacaca;
 }
@@ -16,6 +19,30 @@ input[type=number] {
 
   /* Acorta el ancho del campo*/
   width: 55px;
+}
+
+.historial-propinas {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.historial-propinas td, .historial-propinas th {
+  border: 1px solid #a1a1a1;
+  padding: 4px;
+}
+
+.historial-propinas tr:nth-child(even){background-color: #f2f2f2;}
+
+.historial-propinas tr:hover {background-color: #ddd;}
+
+.historial-propinas th {
+  text-align: center;
+  background-color: #04AA6D;
+  color: white;
+}
+
+.historial-propinas td {
+  text-align: center;
 }
 
 .datos-personales {
