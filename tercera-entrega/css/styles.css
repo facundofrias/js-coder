@@ -31,7 +31,14 @@ input[type=number] {
   padding: 4px;
 }
 
-.historial-propinas tr:nth-child(even){background-color: #f2f2f2;}
+/* .historial-propinas tr:nth-child(even){background-color: #f2f2f2;} */
+.datos-propinas:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.datos-propinas:hover {
+  background-color: #ddd;
+}
 
 .historial-propinas tr:hover {background-color: #ddd;}
 

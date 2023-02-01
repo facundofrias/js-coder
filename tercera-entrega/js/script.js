@@ -228,7 +228,7 @@ function calcularMontoTotalYPropina() {
   for (let i = 0; i < montosComensalesHTML.length; i++) {
     propina.totalCuenta = Number(propina.totalCuenta) + Number(montosComensalesHTML[i].value);
     // propinaComensal = Number(montosComensalesHTML[i].value) / propina.porcentajePropina;
-    propinaComensal = Number(montosComensalesHTML[i].value) * (Number(propina.porcentajePropina) / 100);
+    propinaComensal = sinCeros(Number(montosComensalesHTML[i].value) * (Number(propina.porcentajePropina) / 100));
     propina.montosComensales[i] = montosComensalesHTML[i].value;
     montosComensalesHTML[i].nextElementSibling.textContent = `Propina: $${propinaComensal}`;
   }
@@ -246,8 +246,9 @@ function almacenarPropina(propina) {
     if(localStorage.getItem("propinas") !== null) {    
       propinas = JSON.parse(localStorage.getItem('propinas'));      
       // Si la cantidad de propinas almacenadas es igual a 5, borra la útima
-      if(propina.length == 1) {
-
+      if(propinas.length == 1) {
+        console.log("entra");
+        generarTituloYEncabezadoPropinas();
       }
       if (propinas.length == 2) {
         propinas.pop();
@@ -256,6 +257,7 @@ function almacenarPropina(propina) {
     propinas.push(propina);
     propinas.reverse(propinas.fecha);
     localStorage.setItem("propinas", JSON.stringify(propinas));
+    mostrarUltimasPropinas(propinas);
   }
   //mostrarUltimasPropinas(propinas);
 }
@@ -266,8 +268,8 @@ function generarTituloYEncabezadoPropinas() {
         <h4 id="titulo-historial-propinas">Historial de propinas</h4>
       `,
       tableHTML = `
-          <table class="historial-propinas" id="customers">
-            <tr>
+          <table class="historial-propinas" id="tabla-propinas">
+            <tr id="encabezado-propinas">
               <th>Fecha</th>
               <th>Cantidad de comensales</th>
               <th>Monto total</th>
@@ -276,16 +278,25 @@ function generarTituloYEncabezadoPropinas() {
             </tr>
           </table>
         `,
-        textoBienvenida = document.getElementById("texto-bienvenida");
+  textoBienvenida = document.getElementById("texto-bienvenida");
   textoBienvenida.insertAdjacentHTML("afterend", historialPropinasHTML);
   historialPropinasHTML = document.getElementById("titulo-historial-propinas");
+  historialPropinasHTML.insertAdjacentHTML("afterend", tableHTML);
 }
 
 function mostrarUltimasPropinas(propinas) {
-  // Carga datos de propinas en la tabla
-  for (let i = 0; i < propinas.length; i++) {
-
-  }
+  let i = propinas.length - 1,
+      trDatosPropinas = document.createElement("tr");
+      datos = `
+                <th>${propinas[i].fecha}</th>
+                <th>${propinas[i].cantidadPersonas}</th>
+                <th>${propinas[i].totalCuenta}</th>
+                <th>${propinas[i].porcentajePropina}</th>
+                <th>${propinas[i].totalPropina}</th>
+            `;
+  trDatosPropinas.classList.add("datos-propinas");
+  trDatosPropinas.innerHTML = datos;
+  document.getElementById("tabla-propinas").appendChild(trDatosPropinas);
 }
 
 // Limpia el html dedicado a calcular propina
