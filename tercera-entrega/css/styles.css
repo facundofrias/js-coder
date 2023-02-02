@@ -1,8 +1,13 @@
+/* GLOBALES */
 * {
   font-family: Arial, Helvetica, sans-serif;
 }
 body {
   background-color: #cacaca;
+}
+
+a {
+  font-weight: 700;
 }
 
 /* Ocultar flechas input */
@@ -21,6 +26,11 @@ input[type=number] {
   width: 55px;
 }
 
+/* ------ Fin GLOBALES ------ */
+
+
+/* ------ Historial de propinas ------ */
+
 .historial-propinas {
   border-collapse: collapse;
   width: 100%;
@@ -31,8 +41,7 @@ input[type=number] {
   padding: 4px;
 }
 
-/* .historial-propinas tr:nth-child(even){background-color: #f2f2f2;} */
-.datos-propinas:nth-child(even) {
+.datos-propinas {
   background-color: #f2f2f2;
 }
 
@@ -48,9 +57,16 @@ input[type=number] {
   color: white;
 }
 
-.historial-propinas td {
+.data {
   text-align: center;
 }
+
+.num {
+  text-align: right;
+}
+
+
+/* ------ Estilos de registro ------ */
 
 .datos-personales {
   margin-bottom: 1.5rem;
@@ -66,6 +82,8 @@ input[type=number] {
 .btn-registro {
   width: 5.5rem;
 }
+
+/* ------ Estilos propina ------ */
 
 .datos-iniciales {
   display: grid;

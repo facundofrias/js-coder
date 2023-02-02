@@ -95,18 +95,6 @@ function almacenarCliente(nombre, apellido, dni) {
 
 // FUNCIONES
 
-// Verifica si existe cliente y completa los datos personales
-function existeCliente() {
-  if (localStorage.getItem('cliente') !== null) {
-    completarDatosCliente();
-    existenPropinas();
-  }
-}
-
-// Verifica si existen propinas
-function existenPropinas() {
-}
-
 // Completa los datos del cliente en el formulario 
 // Reemplaza el texto del botón de registro por "Cambiar"
 // Reemplaza el texto de bienvenida a la app
@@ -122,12 +110,6 @@ function completarDatosCliente() {
   
   // Evento que se dispara cuando se hace clic sobre "anónima"
   document.getElementById("anonima").addEventListener("click", limpiarStorage);
-}
-
-// Limpia el local storage permitiendo que la app tenga su html nativo
-function limpiarStorage() {
-  localStorage.removeItem('cliente');
-  window.location.reload();
 }
 
 // Valida los campos "Porcentaje propina" y "Cantidad de comensales" y muestra los inputs correspondientes a cantidad de comensales
@@ -192,8 +174,6 @@ btnCalcularPropina.addEventListener("click", validarMontosComensales);
   contenedorPrincipal.appendChild(totales);
 }
 
-// Funciones de utilidad
-
 // Valida el correcto ingreso de los montos de cada comensal
 function validarMontosComensales() {
   let montosComensales = document.getElementsByClassName("field"),
@@ -244,19 +224,19 @@ function almacenarPropina(propina) {
   let propinas = [];
   if (localStorage.getItem('cliente') !== null) {
     if(localStorage.getItem("propinas") !== null) {    
-      propinas = JSON.parse(localStorage.getItem('propinas'));      
-      // Si la cantidad de propinas almacenadas es igual a 5, borra la útima
-      if(propinas.length == 1) {
-        console.log("entra");
-        generarTituloYEncabezadoPropinas();
-      }
-      if (propinas.length == 2) {
-        propinas.pop();
-        }
+      propinas = JSON.parse(localStorage.getItem('propinas')); 
       }
     propinas.push(propina);
-    propinas.reverse(propinas.fecha);
     localStorage.setItem("propinas", JSON.stringify(propinas));
+    propinas = JSON.parse(localStorage.getItem('propinas'));
+    // Si la cantidad de propinas almacenadas es igual a 5, borra la útima
+    if(propinas.length == 1) {
+      generarTituloYEncabezadoPropinas();
+    }
+    if(propinas.length > 5) {
+      propinas.shift();
+      localStorage.setItem("propinas", JSON.stringify(propinas));
+    }
     mostrarUltimasPropinas(propinas);
   }
   //mostrarUltimasPropinas(propinas);
@@ -265,7 +245,7 @@ function almacenarPropina(propina) {
 // Genera el título y encabezado del historial de propinas
 function generarTituloYEncabezadoPropinas() {
   let historialPropinasHTML = `
-        <h4 id="titulo-historial-propinas">Historial de propinas</h4>
+        <h4 id="titulo-historial-propinas">Tu historial de propinas (guardamos tus últimas 5 propinas)</h4> 
       `,
       tableHTML = `
           <table class="historial-propinas" id="tabla-propinas">
@@ -284,19 +264,30 @@ function generarTituloYEncabezadoPropinas() {
   historialPropinasHTML.insertAdjacentHTML("afterend", tableHTML);
 }
 
+// Limpia las propinas
+function limpiarListaPropinas() {
+  document.querySelectorAll('.datos-propinas').forEach(elemento => {
+    elemento.remove();
+  });
+}
+
+// Muestra las últimas 5 propinas del cliente registrado
 function mostrarUltimasPropinas(propinas) {
-  let i = propinas.length - 1,
-      trDatosPropinas = document.createElement("tr");
-      datos = `
-                <th>${propinas[i].fecha}</th>
-                <th>${propinas[i].cantidadPersonas}</th>
-                <th>${propinas[i].totalCuenta}</th>
-                <th>${propinas[i].porcentajePropina}</th>
-                <th>${propinas[i].totalPropina}</th>
-            `;
-  trDatosPropinas.classList.add("datos-propinas");
-  trDatosPropinas.innerHTML = datos;
-  document.getElementById("tabla-propinas").appendChild(trDatosPropinas);
+  propinas.reverse(propinas.fecha);
+  limpiarListaPropinas();
+  for (let i = 0; i < propinas.length; i++) {
+    let trDatosPropinas = document.createElement("tr");
+        datos = `
+                  <td class="data">${propinas[i].fecha}</td>
+                  <td class="data">${propinas[i].cantidadPersonas}</td>
+                  <td class="num">$${propinas[i].totalCuenta}</td>
+                  <td class="num">${propinas[i].porcentajePropina}%</td>
+                  <td class="num">$${propinas[i].totalPropina}</td>
+              `;
+    trDatosPropinas.classList.add("datos-propinas");
+    trDatosPropinas.innerHTML = datos;
+    document.getElementById("tabla-propinas").appendChild(trDatosPropinas);
+  }
 }
 
 // Limpia el html dedicado a calcular propina
@@ -307,6 +298,31 @@ function limpiarPropina() {
     contenedorPrincipal.removeChild(document.getElementById("btn-calcular-propina"));
     contenedorPrincipal.removeChild(document.getElementById("totales"));
   }
+}
+
+
+// Funciones de utilidad
+
+// Verifica si existe cliente y completa los datos personales
+function existeCliente() {
+  if (localStorage.getItem('cliente') !== null) {
+    completarDatosCliente();
+    existenPropinas();
+  }
+}
+
+// Verifica si existen propinas asociadas a cliente y completa el historial de clientes
+function existenPropinas() {
+  if(localStorage.getItem("propinas") !== null) {
+    generarTituloYEncabezadoPropinas();
+    mostrarUltimasPropinas(JSON.parse(localStorage.getItem('propinas')));
+  }
+}
+
+// Limpia el local storage permitiendo que la app tenga su html nativo
+function limpiarStorage() {
+  localStorage.removeItem('cliente');
+  window.location.reload();
 }
 
 // Suprime los ".00" de los números float
