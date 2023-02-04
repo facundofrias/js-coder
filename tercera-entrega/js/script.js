@@ -50,24 +50,53 @@ class Propina {
 
 // ----- MAIN -----
 
-// Verifica la existencia de un cliente para cargar sus datos
-existeCliente();
-
 // Declaración variables
-let porcentajePropina = document.getElementById("porcentaje-propina"),
+let textoBienvenida = document.getElementById("texto-bienvenida"),
+    textoDatosPersonales = document.getElementById("texto-datos-personales"),
+    porcentajePropina = document.getElementById("porcentaje-propina"),
     cantidadComensales = document.getElementById("cantidad-comensales"),
     btnSiguiente = document.getElementById("btn-mostrar-comensales"),
     contenedorPrincipal = document.getElementById("contenedor-principal"),
-    btnRegistro = document.getElementById("btn-registro");
+    datosRegistro = document.getElementById("registro-datos");
 
+// Verifica la existencia de un cliente y en caso que exista, muestra sus datos
+existeCliente();
 
 // ----- EVENTOS -----
+
+// Se dispara cuando se pretende completar datos
+datosRegistro.addEventListener("click", mostrarDatosRegistro);
+
 // Se dispara cuando se establecieron valores en campos de porcentaje propina y cantidad de comensales
-btnSiguiente.addEventListener("click", validarYGenerarCampos);
+btnSiguiente.addEventListener("click", generarComensales);
 
-// Se dispara cuando se pretende efectuar registro de cliente
-btnRegistro.addEventListener("click", validarRegistro);
 
+// ----- FUNCIONES -----
+
+// ---- Registro de datos personales ----
+
+// Muestra el div contenedor del formulario de datos personales
+function mostrarDatosRegistro() {
+  // document.getElementById("datos-personales").classList.remove("oculto");
+  if (!document.getElementById("datos-personales")) {
+    let formDatosPersonales = `
+          <div class="datos-personales" id="datos-personales">
+            <label class="field__title">Nombre/s:</label>
+            <input class="field-datos" type="text" id="nombre">
+            <label class="field__title">Apellido/s:</label>
+            <input class="field-datos" type="text" id="apellido">
+            <label class="field__title">DNI:</label>
+            <input class="field-datos" type="text" id="dni">
+            <button class="btn-registro" id="btn-registro">Registrarse</button>
+          </div>
+          `;
+          
+    textoDatosPersonales.insertAdjacentHTML("afterend", formDatosPersonales);
+    // Se dispara cuando se pretende efectuar registro de cliente
+    document.getElementById("btn-registro").addEventListener("click", validarRegistro);
+  }
+    document.getElementById("nombre").focus();
+}   
 
 // Valida que los datos ingresados en el formulario de registro sean válidos
 function validarRegistro() {
@@ -84,41 +113,41 @@ function validarRegistro() {
 
 // Almacena cliente
 function almacenarCliente(nombre, apellido, dni) {
-  borrarDatosClienteYPropinas();
+  
+  console.log("llega")
   if (document.getElementById("btn-registro").textContent == "Cambiar") {
     limpiarStorage();
   } else {
     document.getElementById("btn-registro").textContent = "Cambiar"
   }
-  let cliente = new Cliente(nombre, apellido, dni),
-      textoBienvenida = document.getElementById("texto-bienvenida");
+  borrarDatosClienteYPropinas();
+  let cliente = new Cliente(nombre, apellido, dni);
   localStorage.setItem('cliente', JSON.stringify(cliente));
   textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
-  document.getElementById("texto-datos-personales").innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés cambiar tus datos personales; o utilizar la app de manera anónima haciendo clic <a href="" id="anonima">acá</a>.`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">cambiar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.`;
+  // Se dispara cuando se pretende completar datos
+  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
   generarEventoBorrarHistorialYPropinas();
 }
-
-// ----- FUNCIONES -----
-
 
 // Completa los datos del cliente en el formulario 
 // Reemplaza el texto del botón de registro por "Cambiar"
 // Reemplaza el texto de bienvenida a la app
 function completarDatosCliente() {
   let c = JSON.parse(localStorage.getItem('cliente'));
-  document.getElementById("nombre").value = c.nombre;
-  document.getElementById("apellido").value = c.apellido;
-  document.getElementById("dni").value = c.dni;
-  
   document.getElementById("texto-bienvenida").textContent = `¡Te damos la bienvenida nuevamente, ${c.nombre}!`;
-  document.getElementById("texto-datos-personales").innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés cambiar tus datos personales; o utilizar la app de manera anónima haciendo clic <a href="" id="anonima">acá</a>.`;
-  document.getElementById("btn-registro").textContent = "Cambiar";
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">cambiar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.`;
   
-  generarEventoBorrarHistorialYPropinas();  
+  // Se dispara cuando se pretende completar datos
+  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
+  generarEventoBorrarHistorialYPropinas();
 }
 
+
+// ---- Propina ----
+
 // Valida los campos "Porcentaje propina" y "Cantidad de comensales" y muestra los inputs correspondientes a cantidad de comensales
-function validarYGenerarCampos() {
+function validarCamposPropina() {
   if (!validarNumero(porcentajePropina.value)) {
     alert("¡El valor ingresado en porcentaje de propina es inválido!");
   }
@@ -126,22 +155,23 @@ function validarYGenerarCampos() {
   if (!validarNumeroEntero(cantidadComensales.value)) {
     alert("¡El valor ingresado en Cantidad de comensales es inválido!");
   }
-
-  if (validarNumero(porcentajePropina.value) && validarNumeroEntero(cantidadComensales.value)) {
-    generarComensales();
-  }
 }
 
 // Genera los inputs correspondientes a la cantidad de comensales
 function generarComensales() {
-  const contenedorCalculoPropina = document.createElement("div"),
+  validarCamposPropina();
+  if (validarNumero(porcentajePropina.value) && validarNumeroEntero(cantidadComensales.value)) {
+    
+    // Declaración de variables
+    const contenedorCalculoPropina = document.createElement("div"),
         tituloMontosComensales = document.createElement("h3"),
         montos = document.createElement("div"),
         btnCalcularPropina = document.createElement("button"),
-        btnBorrarDatosPropina = document.createElement("button");
+        btnNuevaPropina = document.createElement("button");
         
   limpiarPropina();
   
+  // Agrega propiedades a variables creadas
   contenedorCalculoPropina.id = "contenedor-calculo-propina";
   contenedorPrincipal.appendChild(contenedorCalculoPropina);
 
@@ -153,35 +183,40 @@ function generarComensales() {
   montos.id = "montos";
   contenedorCalculoPropina.appendChild(montos);
   
+  // Crea y muestra los campos de los comensales
   for (let i = 0; i < cantidadComensales.value; i++) {
     let field = `
         <div class="field">
-          <label class="field__title" for="name">Persona ${i + 1}:</label>
+          <label class="field__title" for="name">Comensal ${i + 1}:</label>
           <input class="monto-propinas" type="number">
           <span class="propina">Propina:</span>
         </div>
         `;
-  
     montos.innerHTML = montos.innerHTML + field;
   }
 
   // Setea focus en el primer input "monto propinas"
   document.getElementsByClassName("monto-propinas")[0].focus();
+
   // Agrega botón "Calcular propina"
   btnCalcularPropina.textContent = "Calcular propina";
   btnCalcularPropina.id = "btn-calcular-propina";
+  btnCalcularPropina.classList.add("btns-calculo-propina");
   contenedorCalculoPropina.appendChild(btnCalcularPropina);
-  // Genera botón "Limpiar"
-  btnBorrarDatosPropina.textContent = "Limpiar";
-  btnBorrarDatosPropina.id = "btn-borrar-datos-propina";
-  contenedorCalculoPropina.appendChild(btnBorrarDatosPropina);
-  
+
   // Evento que se dispara cuando se pretende calcular la propina (click en botón "Calcula propina")
   btnCalcularPropina.addEventListener("click", validarMontosComensales);
-  
-  // Evento que se dispara cuando se pretende limpiar los campos del cálculo de propina
-  btnBorrarDatosPropina.addEventListener("click", borrarDatosPropina);
 
+  // Agrega botón "Nueva propina"
+  btnNuevaPropina.textContent = "Nueva propina";
+  btnNuevaPropina.classList.add("btns-calculo-propina");
+  btnNuevaPropina.id = "btn-nueva-propina";
+  contenedorCalculoPropina.appendChild(btnNuevaPropina);
+  
+  // Evento que se dispara cuando se pretende ingresar nueva propina
+  btnNuevaPropina.addEventListener("click", borrarDatosPropina);
+
+  // Genera y muestra información de totales a pagar
   const totales = document.createElement("div");
   totales.classList.add("totales");
   totales.id = "totales";
@@ -191,6 +226,7 @@ function generarComensales() {
   `;
   totales.innerHTML = textoTotales;
   contenedorCalculoPropina.appendChild(totales);
+  }  
 }
 
 // Valida el correcto ingreso de los montos de cada comensal
@@ -199,20 +235,24 @@ function validarMontosComensales() {
       nombresDatosInvalidos = [],
       montosErroneos = `Existen datos erróneos, estos se encuentran en:\n`;
 
-  for (let i = 0; i < montosComensales.length; i++) {
-    let valorIngresado = montosComensales[i].firstElementChild.nextElementSibling.value;
-    if (!validarNumero(valorIngresado)) {
-      nombresDatosInvalidos.push(montosComensales[i].firstElementChild.textContent.slice(0, -1));
+  if (montosComensales.length == document.getElementById("cantidad-comensales").value) {
+    for (let i = 0; i < montosComensales.length; i++) {
+      let valorIngresado = montosComensales[i].firstElementChild.nextElementSibling.value;
+      if (!validarNumero(valorIngresado)) {
+        nombresDatosInvalidos.push(montosComensales[i].firstElementChild.textContent.slice(0, -1));
+      } 
+    }
+    
+    for (let i = 0; i < nombresDatosInvalidos.length; i++) {
+      montosErroneos = montosErroneos + `${nombresDatosInvalidos[i]}\n`;
     } 
-  }
-  
-  for (let i = 0; i < nombresDatosInvalidos.length; i++) {
-    montosErroneos = montosErroneos + `${nombresDatosInvalidos[i]}\n`;
-  } 
-  if(montosErroneos !== `Existen datos erróneos, estos se encuentran en:\n`) {
-    alert(montosErroneos);
+    if(montosErroneos !== `Existen datos erróneos, estos se encuentran en:\n`) {
+      alert(montosErroneos);
+    } else {
+      calcularMontoTotalYPropina();
+    }
   } else {
-    calcularMontoTotalYPropina();
+    alert("Error! La cantidad de comensales ingresada no coincide con la cantidad de campos generados.");
   }
 }
 
@@ -235,34 +275,9 @@ function calcularMontoTotalYPropina() {
   propina.totalPropina = sinCeros(Number(propina.totalCuenta) * (Number(propina.porcentajePropina) / 100));
   document.getElementById("monto-total").textContent = `Monto total a pagar: $${propina.totalCuenta}`;
   document.getElementById("propina-total").textContent = `Propina total: $${propina.totalPropina}`;
+  
+  // Llamado a la función que muestra el historial de propinas
   almacenarPropina(propina);
-}
-
-// Limpia el html dedicado a calcular propina
-function limpiarPropina() {
-  if(document.getElementById("contenedor-calculo-propina")) {
-    document.getElementById("contenedor-calculo-propina").remove();
-    // document.getElementById("titulo-montos").remove();
-    // document.getElementById("montos").remove();
-    // document.getElementById("btn-calcular-propina").remove();
-    // document.getElementById("btn-borrar-datos-propina").remove();
-    // document.getElementById("totales").remove();
-  }
-}
-
-// Borra datos de propina ingresada
-function borrarDatosPropina() {
-  if(document.getElementById("contenedor-calculo-propina")) {
-    document.getElementById("contenedor-calculo-propina").remove();
-    // document.getElementById("titulo-montos").remove();
-    // document.getElementById("montos").remove();
-    // document.getElementById("btn-calcular-propina").remove();
-    // document.getElementById("btn-borrar-datos-propina").remove();
-    // document.getElementById("totales").remove();
-    porcentajePropina.value = "";
-    cantidadComensales.value = "";
-    porcentajePropina.focus();
-  }
 }
 
 // Almacena propina asociada a cliente
@@ -279,7 +294,7 @@ function almacenarPropina(propina) {
     if(propinas.length == 1) {
       generarTituloYEncabezadoPropinas();
     }
-    if(propinas.length > 2) {
+    if(propinas.length > 5) {
       propinas.shift();
       localStorage.setItem("propinas", JSON.stringify(propinas));
     }
@@ -296,10 +311,10 @@ function generarTituloYEncabezadoPropinas() {
           <table class="historial-propinas" id="tabla-propinas">
             <tr id="encabezado-propinas">
               <th>Fecha</th>
-              <th>Cantidad de comensales</th>
+              <th>Cant. comensales</th>
               <th>Monto total</th>
-              <th>Porcentaje propina</th>
-              <th>Monto propina</th>
+              <th>% propina</th>
+              <th>Total propina</th>
             </tr>
           </table>
         `,
@@ -309,17 +324,10 @@ function generarTituloYEncabezadoPropinas() {
   historialPropinasHTML.insertAdjacentHTML("afterend", tableHTML);
 }
 
-// Limpia las propinas
-function limpiarListaPropinas() {
-  document.querySelectorAll('.datos-propinas').forEach(elemento => {
-    elemento.remove();
-  });
-}
-
 // Muestra las últimas 5 propinas del cliente registrado
 function mostrarUltimasPropinas(propinas) {
   propinas.reverse(propinas.fecha);
-  limpiarListaPropinas();
+  limpiarListaHistorialPropinas();
   for (let i = 0; i < propinas.length; i++) {
     let trDatosPropinas = document.createElement("tr");
         datos = `
@@ -335,11 +343,42 @@ function mostrarUltimasPropinas(propinas) {
   }
 }
 
+// Limpia el html dedicado a calcular propina
+function limpiarPropina() {
+  if(document.getElementById("contenedor-calculo-propina")) {
+    document.getElementById("contenedor-calculo-propina").remove();
+  }
+}
+
+// Borra datos de propina ingresada
+function borrarDatosPropina() {
+  if(document.getElementById("contenedor-calculo-propina")) {
+    document.getElementById("contenedor-calculo-propina").remove();
+    limpiarCamposPropina();
+  }
+}
+
+// Limpia todas las filas en el historial de propinas
+function limpiarListaHistorialPropinas() {
+  document.querySelectorAll('.datos-propinas').forEach(elemento => {
+    elemento.remove();
+  });
+}
+
+function limpiarCamposPropina() {
+  porcentajePropina.value = "";
+  cantidadComensales.value = "";
+  porcentajePropina.focus();
+}
+
 // Borra storage de Cliente y Propinas y recarga la página para cargar el contenido HTML por defecto
 function borrarDatosClienteYPropinas() {
   limpiarStorage();
   borrarHistorialPropinas();
   borrarDatosPropina();
+  refrescar();
+  limpiarCamposPropina();
+
   // window.location.reload();
 }
 
@@ -379,6 +418,19 @@ function limpiarStorage() {
   localStorage.removeItem('cliente');
   localStorage.removeItem('propinas');
 }
+
+function refrescar() {
+  textoBienvenida.textContent = "¡Te damos la bienvenida!";
+  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas.`;
+
+  if(document.getElementById("datos-personales")) {
+    document.getElementById("datos-personales").remove();
+  }
+
+  // Se dispara cuando se pretende completar datos
+  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
+}
+
 
 // Suprime los ".00" de los números float
 function sinCeros(num) {
