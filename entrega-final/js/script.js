@@ -10,7 +10,7 @@ class Cliente {
 
 class Propina {
   constructor(
-    fecha = new Date(),
+    fecha,
     porcentajePropina,
     cantidadPersonas,
     totalPropina = 0,
@@ -29,8 +29,9 @@ class Propina {
 
   // Formatea la fecha
   formatearFecha() {
-    const yyyy = this.fecha.getFullYear();
-    let mm = this.fecha.getMonth() + 1,
+    this.fecha = new Date();
+    let yyyy = this.fecha.getFullYear(),
+        mm = this.fecha.getMonth() + 1,
         dd = this.fecha.getDate(),
         hora = this.fecha.getHours(),
         minutos = this.fecha.getMinutes(),
@@ -53,15 +54,15 @@ class Propina {
 // Declaración variables
 let textoBienvenida = document.getElementById("texto-bienvenida"),
     textoDatosPersonales = document.getElementById("texto-datos-personales"),
-    porcentajePropina = parseFloat(document.getElementById("porcentaje-propina").value),
-    cantidadComensales = parseInt(document.getElementById("cantidad-comensales").value),
+    porcentajePropina = document.getElementById("porcentaje-propina"),
+    cantidadComensales = document.getElementById("cantidad-comensales"),
     btnSiguiente = document.getElementById("btn-mostrar-comensales"),
     contenedorPrincipal = document.getElementById("contenedor-principal"),
     datosRegistro = document.getElementById("registro-datos");
 
 // Verifica la existencia de un cliente y en caso que exista, muestra sus datos
 existeCliente();
-console.log(document.getElementById("cantidad-comensales").value)
+let propina = new Propina();
 // ----- EVENTOS -----
 
 // Se dispara cuando se pretende completar datos
@@ -146,20 +147,25 @@ function completarDatosCliente() {
 
 // Valida los campos "Porcentaje propina" y "Cantidad de comensales" y muestra los inputs correspondientes a cantidad de comensales
 function validarCamposPropina() {
-  if (!validarNumero(porcentajePropina.value)) {
+  propina.porcentajePropina = parseFloat(porcentajePropina.value);
+  propina.cantidadPersonas = parseInt(cantidadComensales.value);
+  let valido = false;
+  if (validarNumero(propina.porcentajePropina)) {
+    valido = true;
+  } else {
+    valido = false;
     alert("¡El valor ingresado en porcentaje de propina es inválido!");
   }
-
-  if (!validarNumeroEntero(cantidadComensales)) {
+  if (!validarNumeroEntero(propina.cantidadPersonas)) {
     alert("¡El valor ingresado en Cantidad de comensales es inválido!");
+    valido = false;
   }
+  return valido;
 }
 
 // Genera los inputs correspondientes a la cantidad de comensales
 function generarComensales() {
-  validarCamposPropina();
-  if (validarNumero(porcentajePropina.value) && validarNumeroEntero(cantidadComensales)) {
-    
+  if (validarCamposPropina()) {
     // Declaración de variables
     const contenedorCalculoPropina = document.createElement("div"),
         tituloMontosComensales = document.createElement("h3"),
@@ -182,7 +188,7 @@ function generarComensales() {
   contenedorCalculoPropina.appendChild(montos);
   
   // Crea y muestra los campos de los comensales
-  for (let i = 0; i < cantidadComensales; i++) {
+  for (let i = 0; i < propina.cantidadPersonas; i++) {
     let field = `
         <div class="field">
           <label class="field__title" for="name">Comensal ${i + 1}:</label>
@@ -256,11 +262,10 @@ function validarMontosComensales() {
 
 // Calcula el monto total a pagar y la propina total
 function calcularMontoTotalYPropina() {
-  const propina = new Propina();
   let propinaComensal,
       montosComensalesHTML = document.getElementsByClassName("monto-propinas");
   propina.fecha = propina.formatearFecha();
-  propina.cantidadPersonas = cantidadComensales;
+  // propina.cantidadPersonas = cantidadComensales;
   propina.porcentajePropina = Number(porcentajePropina.value);
   for (let i = 0; i < montosComensalesHTML.length; i++) {
     propina.totalCuenta = Number(propina.totalCuenta) + Number(montosComensalesHTML[i].value);
@@ -353,6 +358,7 @@ function borrarDatosPropina() {
   if(document.getElementById("contenedor-calculo-propina")) {
     document.getElementById("contenedor-calculo-propina").remove();
     limpiarCamposPropina();
+    propina = new Propina();
   }
 }
 
@@ -365,7 +371,7 @@ function limpiarListaHistorialPropinas() {
 
 function limpiarCamposPropina() {
   porcentajePropina.value = "";
-  cantidadComensales = "";
+  cantidadComensales.value = "";
   porcentajePropina.focus();
 }
 
@@ -447,7 +453,6 @@ function validarNumero(valor) {
 
 // Determina que el valor ingresado sea numérico y entero positivo
 function validarNumeroEntero(valor) {
-  console.log(valor)
   return (!isNaN(Number(valor)) );
   // if (isNaN(valor) || Number(valor) <= 0 || !Number.isInteger(Number(valor))) {
   //   return false;
