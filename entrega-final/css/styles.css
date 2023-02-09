@@ -1,0 +1,124 @@
+/* GLOBALES */
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+body {
+  background-color: #cacaca;
+}
+
+a {
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #04AA6D;
+}
+
+/* Ocultar flechas input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+
+  /* Acorta el ancho del campo*/
+  width: 55px;
+}
+
+/* Generales */
+
+.oculto {
+  display: none !important;
+}
+
+/* ------ Fin GLOBALES ------ */
+
+
+/* ------ Historial de propinas ------ */
+
+.historial-propinas {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.historial-propinas td, .historial-propinas th {
+  border: 1px solid #a1a1a1;
+  padding: 4px;
+}
+
+.datos-propinas {
+  background-color: #f2f2f2;
+}
+
+.datos-propinas:hover {
+  background-color: #ddd;
+}
+
+.historial-propinas tr:hover {background-color: #ddd;}
+
+.historial-propinas th {
+  text-align: center;
+  background-color: #04AA6D;
+  color: white;
+}
+
+.data {
+  text-align: center;
+}
+
+.num {
+  text-align: right;
+}
+
+
+/* ------ Estilos de registro ------ */
+
+.datos-personales {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-datos {
+  margin-bottom: 14px;
+  width: 14rem;
+}
+
+.btn-registro {
+  width: 5.5rem;
+}
+
+/* ------ Estilos propina ------ */
+
+.datos-iniciales {
+  display: grid;
+  grid-template-columns: 40% 40% 20%;
+}
+
+.field-inicial,
+.field {
+  margin: 7px 0;
+}
+
+/* ------ Estilos cálculo propina ------ */
+
+.btns-calculo-propina {
+  margin: 14px 15px 0 0px;
+}
+
+.totales,
+.montos {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.totales {
+  margin-top: 1.5rem;
+}
