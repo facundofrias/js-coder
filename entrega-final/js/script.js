@@ -1,10 +1,11 @@
 // Declaración de  clases
 
 class Cliente {
-  constructor(nombre, apellido, dni) {
+  constructor(nombre, apellido, dni, propinas = []) {
     this.nombre = nombre;
     this.apellido = apellido;
     this.dni = dni;
+    this.propinas = propinas;
   }
 }
 
@@ -60,7 +61,8 @@ let textoBienvenida = document.getElementById("texto-bienvenida"),
     contenedorPrincipal = document.getElementById("contenedor-principal"),
     datosRegistro = document.getElementById("registro-datos");
 
-// Verifica la existencia de un cliente y en caso que exista, muestra sus datos
+// Verifica la existencia de un cliente y en caso que exista, le da una bienvenida personalizada
+// A su vez, verifica si tiene propinas asociadas y las muestra en una tabla
 existeCliente();
 let propina = new Propina();
 // ----- EVENTOS -----
@@ -262,37 +264,44 @@ function validarMontosComensales() {
 
 // Calcula el monto total a pagar y la propina total
 function calcularMontoTotalYPropina() {
-  let propinaComensal,
+  const propina = new Propina();
+  let propinaComensal = 0,
+      montoComensalHTML,
       montosComensalesHTML = document.getElementsByClassName("monto-propinas");
   propina.fecha = propina.formatearFecha();
-  // propina.cantidadPersonas = cantidadComensales;
-  propina.porcentajePropina = Number(porcentajePropina.value);
+  propina.cantidadPersonas = parseInt(cantidadComensales.value);
+  propina.porcentajePropina = parseFloat(porcentajePropina.value);
   for (let i = 0; i < montosComensalesHTML.length; i++) {
-    propina.totalCuenta = Number(propina.totalCuenta) + Number(montosComensalesHTML[i].value);
-    // propinaComensal = Number(montosComensalesHTML[i].value) / propina.porcentajePropina;
-    propinaComensal = sinCeros(Number(montosComensalesHTML[i].value) * (Number(propina.porcentajePropina) / 100));
-    propina.montosComensales[i] = montosComensalesHTML[i].value;
+    montoComensalHTML = parseFloat(montosComensalesHTML[i].value)
+    propina.totalCuenta = parseFloat(propina.totalCuenta) + montoComensalHTML;
+    // propinaComensal = montoComensalHTML / propina.porcentajePropina;
+    propinaComensal = sinCeros(montoComensalHTML * propina.porcentajePropina / 100);
+    propina.montosComensales[i] = montoComensalHTML;
     montosComensalesHTML[i].nextElementSibling.textContent = `Propina: $${propinaComensal}`;
   }
-  // propina.totalPropina = sinCeros(Number(propina.totalCuenta) / propina.porcentajePropina);
-  propina.totalPropina = sinCeros(Number(propina.totalCuenta) * (Number(propina.porcentajePropina) / 100));
+  propina.totalPropina = sinCeros(propina.totalCuenta * (propina.porcentajePropina / 100));
   document.getElementById("monto-total").textContent = `Monto total a pagar: $${propina.totalCuenta}`;
   document.getElementById("propina-total").textContent = `Propina total: $${propina.totalPropina}`;
-  
   // Llamado a la función que muestra el historial de propinas
   almacenarPropina(propina);
 }
 
 // Almacena propina asociada a cliente
 function almacenarPropina(propina) {
-  let propinas = [];
   if (localStorage.getItem('cliente') !== null) {
+    let cliente = JSON.parse(localStorage.getItem('cliente')),
+        propinas = [];
     if(localStorage.getItem("propinas") !== null) {    
       propinas = JSON.parse(localStorage.getItem('propinas')); 
       }
     propinas.push(propina);
     localStorage.setItem("propinas", JSON.stringify(propinas));
     propinas = JSON.parse(localStorage.getItem('propinas'));
+    
+    // Almacena las propinas en Cliente y luego lo guarda en localStorage 
+    cliente.propinas.push(propina);
+    localStorage.setItem("cliente", JSON.stringify(cliente));
+    
     // Si la cantidad de propinas almacenadas es igual a 5, borra la útima
     if(propinas.length == 1) {
       generarTituloYEncabezadoPropinas();
