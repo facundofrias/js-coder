@@ -5,16 +5,19 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  
   <!-- Estilos css -->
   <link rel="stylesheet" href="./css/styles.css">
+  
+  <!-- SweetAlert2 -->
+  <script src="assets/sweetalert2.all.min.js"></script>
+  
 
   <title>Entrega final</title>
 </head>
 
 <body>
-  <h1>CODERHOUSE - JavaScript</h1>
-  <h2>Entrega final</h2>
+  <h1>CODERHOUSE - JavaScript - Entrega final</h1>
   <h3>Calculadora de propinas</h3>
   <p>Calcula la propina individual de cada consumidor/a tomando como referencia un porcentaje inicial.</p>
   <h3 id="texto-bienvenida">¡Te damos la bienvenida!</h3>
@@ -23,12 +26,12 @@
   <div class="principal" id="contenedor-principal">
     <div class="datos-iniciales">
       <div class="field-inicial">
-        <label class="field__title">Porcentaje propina:</label>
-        <input class="field-input" type="number" name="porcentaje-propina" id="porcentaje-propina" autofocus>
+        <label class="field__title">Cantidad de comensales:</label>
+        <input class="field-input" type="number" name="comensales" id="cantidad-comensales" autofocus>
       </div>
       <div class="field-inicial">
-        <label class="field__title">Cantidad de comensales:</label>
-        <input class="field-input" type="number" name="comensales" id="cantidad-comensales">
+        <label class="field__title">Porcentaje propina:</label>
+        <input class="field-input" type="number" name="porcentaje-propina" id="porcentaje-propina">
       </div>
       <div class="field-inicial">
         <button id="btn-mostrar-comensales">Siguiente</button>
@@ -38,5 +41,4 @@
 
   <script src="js/script.js"></script>
 </body>
-
 </html>

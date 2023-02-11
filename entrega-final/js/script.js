@@ -19,10 +19,10 @@ class Propina {
     montosComensales = []
   ) {
     this.fecha = fecha;
-    this.porcentajePropina = parseInt(porcentajePropina);
-    this.cantidadPersonas = parseInt(cantidadPersonas);
-    this.totalPropina = parseFloat(totalPropina);
-    this.totalCuenta = parseFloat(totalCuenta);
+    this.porcentajePropina = porcentajePropina;
+    this.cantidadPersonas = cantidadPersonas;
+    this.totalPropina = totalPropina;
+    this.totalCuenta = totalCuenta;
     this.montosComensales = montosComensales;
   }
 
@@ -61,9 +61,31 @@ let textoBienvenida = document.getElementById("texto-bienvenida"),
     contenedorPrincipal = document.getElementById("contenedor-principal"),
     datosRegistro = document.getElementById("registro-datos");
 
+// fetch('clientes.json').then(function(resp) {
+//   return resp.json();
+// }).then(function (obj) {
+//   console.log(obj);
+// }).catch(function (error) {
+//   console.log("Ocurrió un error");
+//   console.log(error);
+// });
+
+fetch('clientes.json', {
+        method: 'POST',
+        body: JSON.stringify({
+          nombre: "Facundo",
+          apellido: "Frias",
+          dni: 878787,
+        })
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+
+
 // Verifica la existencia de un cliente y en caso que exista, le da una bienvenida personalizada
 // A su vez, verifica si tiene propinas asociadas y las muestra en una tabla
 existeCliente();
+
 let propina = new Propina();
 // ----- EVENTOS -----
 
@@ -72,7 +94,6 @@ datosRegistro.addEventListener("click", mostrarDatosRegistro);
 
 // Se dispara cuando se establecieron valores en campos de porcentaje propina y cantidad de comensales
 btnSiguiente.addEventListener("click", generarComensales);
-
 
 // ----- FUNCIONES -----
 
@@ -110,7 +131,11 @@ function validarRegistro() {
   if ((nombre !== '') && (apellido !== '') && (validarNumeroEntero(Number(dni)))) {
     almacenarCliente(nombre, apellido, dni);
   } else {
-    alert("¡Datos personales erróneos o incompletos!");
+    Swal.fire({
+      icon: 'error',
+      title: '¡Error!',
+      text: '¡Datos personales erróneos o incompletos!'
+    });
   }
 }
 
@@ -156,10 +181,18 @@ function validarCamposPropina() {
     valido = true;
   } else {
     valido = false;
-    alert("¡El valor ingresado en porcentaje de propina es inválido!");
+    Swal.fire({
+      icon: 'error',
+      title: '¡Error!',
+      text: '¡El valor ingresado en "Porcentaje de propina" es inválido!'
+    });
   }
   if (!validarNumeroEntero(propina.cantidadPersonas)) {
-    alert("¡El valor ingresado en Cantidad de comensales es inválido!");
+    Swal.fire({
+      icon: 'error',
+      title: '¡Error!',
+      text: '¡El valor ingresado en "Cantidad de comensales" es inválido!'
+    })
     valido = false;
   }
   return valido;
@@ -250,31 +283,39 @@ function validarMontosComensales() {
     }
     
     for (let i = 0; i < nombresDatosInvalidos.length; i++) {
-      montosErroneos = montosErroneos + `${nombresDatosInvalidos[i]}\n`;
-    } 
-    if(montosErroneos !== `Existen datos erróneos, estos se encuentran en:\n`) {
-      alert(montosErroneos);
+      montosErroneos = montosErroneos + `${nombresDatosInvalidos[i]}<br/>`;
+    }
+    console.log(nombresDatosInvalidos.length);
+    if(montosErroneos !== `Existen datos erróneos, estos se encuentran en:<br/>`) {
+      Swal.fire({
+        icon: 'error',
+        title: '¡Error!',
+        html: montosErroneos
+      });
     } else {
       calcularMontoTotalYPropina();
     }
   } else {
-    alert("Error! La cantidad de comensales ingresada no coincide con la cantidad de campos generados.");
+    Swal.fire({
+      icon: 'error',
+      title: '¡Error!',
+      text: '¡La cantidad de comensales ingresada no coincide con la cantidad de campos generados!'
+    });
   }
 }
 
 // Calcula el monto total a pagar y la propina total
 function calcularMontoTotalYPropina() {
-  const propina = new Propina();
+  propina.totalCuenta = 0;
+  propina.totalPropina = 0;
+  document.getElementById("btn-calcular-propina").remove();
   let propinaComensal = 0,
       montoComensalHTML,
       montosComensalesHTML = document.getElementsByClassName("monto-propinas");
   propina.fecha = propina.formatearFecha();
-  propina.cantidadPersonas = parseInt(cantidadComensales.value);
-  propina.porcentajePropina = parseFloat(porcentajePropina.value);
   for (let i = 0; i < montosComensalesHTML.length; i++) {
     montoComensalHTML = parseFloat(montosComensalesHTML[i].value)
     propina.totalCuenta = parseFloat(propina.totalCuenta) + montoComensalHTML;
-    // propinaComensal = montoComensalHTML / propina.porcentajePropina;
     propinaComensal = sinCeros(montoComensalHTML * propina.porcentajePropina / 100);
     propina.montosComensales[i] = montoComensalHTML;
     montosComensalesHTML[i].nextElementSibling.textContent = `Propina: $${propinaComensal}`;
@@ -381,7 +422,7 @@ function limpiarListaHistorialPropinas() {
 function limpiarCamposPropina() {
   porcentajePropina.value = "";
   cantidadComensales.value = "";
-  porcentajePropina.focus();
+  cantidadComensales.focus();
 }
 
 // Borra storage de Cliente y Propinas y recarga la página para cargar el contenido HTML por defecto
