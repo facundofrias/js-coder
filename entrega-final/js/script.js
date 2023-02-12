@@ -59,28 +59,22 @@ let textoBienvenida = document.getElementById("texto-bienvenida"),
     cantidadComensales = document.getElementById("cantidad-comensales"),
     btnSiguiente = document.getElementById("btn-mostrar-comensales"),
     contenedorPrincipal = document.getElementById("contenedor-principal"),
-    datosRegistro = document.getElementById("registro-datos");
+    datosRegistro = document.getElementById("registro-datos"),
+    clientes = [];
 
-// fetch('clientes.json').then(function(resp) {
-//   return resp.json();
-// }).then(function (obj) {
-//   console.log(obj);
-// }).catch(function (error) {
-//   console.log("Ocurrió un error");
-//   console.log(error);
-// });
-
-fetch('clientes.json', {
-        method: 'POST',
-        body: JSON.stringify({
-          nombre: "Facundo",
-          apellido: "Frias",
-          dni: 878787,
-        })
-    })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-
+// Petición de clientes
+const pedirClientes = async () => {
+  let clientesPeticion = [];
+  const resp = await fetch('clientes.json');
+  const data = await resp.json();
+  data.clientes.forEach( (element) => {
+    clientesPeticion.push(element);
+  });
+  localStorage.setItem('listaClientes', JSON.stringify(clientesPeticion));
+}
+pedirClientes();
+clientes = JSON.parse(localStorage.getItem("listaClientes"));
+console.log(clientes);
 
 // Verifica la existencia de un cliente y en caso que exista, le da una bienvenida personalizada
 // A su vez, verifica si tiene propinas asociadas y las muestra en una tabla
