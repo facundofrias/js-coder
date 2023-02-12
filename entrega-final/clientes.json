@@ -1,14 +1,12 @@
-{
-  "clientes": [
-    {
-      "nombre": "Julian",
-      "apellido": "Alvarez",
-      "dni": 40123
-    },
-    {
-      "nombre": "Enzo",
-      "apellido": "Fernandez",
-      "dni": 41001
-    }
-  ]
-}
+[ 
+  {
+    "nombre": "Julian",
+    "apellido": "Alvarez",
+    "dni": 40123
+  },
+  {
+    "nombre": "Enzo",
+    "apellido": "Fernandez",
+    "dni": 41001
+  }
+]

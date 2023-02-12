@@ -66,10 +66,10 @@ let textoBienvenida = document.getElementById("texto-bienvenida"),
 const existenClientes = async () => {
   const resp = await fetch('clientes.json');
   const data = await resp.json();
-  await data.clientes.forEach( (element) => {
-    clientes.push(element);
-  });
-  if(clientes.length > 0) {
+  if(data.length > 0) {
+    await data.forEach( (element) => {
+      clientes.push(element);
+    });
     cambiarTextoDatosPersonales();
   }
 }
@@ -82,7 +82,7 @@ let propina = new Propina();
 // ----- EVENTOS -----
 
 // Se dispara cuando se pretende completar datos
-// datosRegistro.addEventListener("click", mostrarDatosRegistro);
+datosRegistro.addEventListener("click", mostrarDatosRegistro);
 
 // Se dispara cuando se establecieron valores en campos de porcentaje propina y cantidad de comensales
 btnSiguiente.addEventListener("click", generarComensales);
@@ -92,17 +92,27 @@ btnSiguiente.addEventListener("click", generarComensales);
 
 function cambiarTextoDatosPersonales() {
   textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas. <br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> e iniciar sesión.`;
-  
   let btnlistaClientes = document.getElementById("lista-clientes");
-  
+  datosRegistro = document.getElementById("registro-datos");
+
   // Se dispara cuando se quiere desplegar la lista de clientes
   btnlistaClientes.addEventListener("click", cargarListaClientes);
+
+  // Se dispara cuando se pretende completar datos
+  datosRegistro.addEventListener("click", mostrarDatosRegistro);
 }
 
-function cargarListaClientes(){
+function cargarListaClientes() {
+  if(document.getElementById("datos-personales")) {
+    document.getElementById("datos-personales").remove();
+  }
+  if(document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").remove();
+  }
   let tablaClientesHTML = `
-      <table class="historial-propinas" id="tabla-clientes">
-        <tr">
+
+      <table class="lista-clientes" id="tabla-clientes">
+        <tr>
           <th>Nombre</th>
           <th>Apellido</th>
           <th>DNI</th>
@@ -130,7 +140,9 @@ function cargarListaClientes(){
 
 // Muestra el div contenedor del formulario de datos personales
 function mostrarDatosRegistro() {
-  // document.getElementById("datos-personales").classList.remove("oculto");
+  if(document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").remove();
+  }
   if (!document.getElementById("datos-personales")) {
     let formDatosPersonales = `
           <div class="datos-personales" id="datos-personales">
