@@ -62,19 +62,17 @@ let textoBienvenida = document.getElementById("texto-bienvenida"),
     datosRegistro = document.getElementById("registro-datos"),
     clientes = [];
 
-// Petición de clientes
-const pedirClientes = async () => {
-  let clientesPeticion = [];
+// Verifica si existen clientes
+const existenClientes = async () => {
   const resp = await fetch('clientes.json');
   const data = await resp.json();
-  data.clientes.forEach( (element) => {
-    clientesPeticion.push(element);
+  await data.clientes.forEach( (element) => {
+    clientes.push(element);
   });
-  localStorage.setItem('listaClientes', JSON.stringify(clientesPeticion));
+  if(clientes.length > 0) {
+    cambiarTextoDatosPersonales();
+  }
 }
-pedirClientes();
-clientes = JSON.parse(localStorage.getItem("listaClientes"));
-console.log(clientes);
 
 // Verifica la existencia de un cliente y en caso que exista, le da una bienvenida personalizada
 // A su vez, verifica si tiene propinas asociadas y las muestra en una tabla
@@ -84,12 +82,49 @@ let propina = new Propina();
 // ----- EVENTOS -----
 
 // Se dispara cuando se pretende completar datos
-datosRegistro.addEventListener("click", mostrarDatosRegistro);
+// datosRegistro.addEventListener("click", mostrarDatosRegistro);
 
 // Se dispara cuando se establecieron valores en campos de porcentaje propina y cantidad de comensales
 btnSiguiente.addEventListener("click", generarComensales);
 
+
 // ----- FUNCIONES -----
+
+function cambiarTextoDatosPersonales() {
+  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas. <br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> e iniciar sesión.`;
+  
+  let btnlistaClientes = document.getElementById("lista-clientes");
+  
+  // Se dispara cuando se quiere desplegar la lista de clientes
+  btnlistaClientes.addEventListener("click", cargarListaClientes);
+}
+
+function cargarListaClientes(){
+  let tablaClientesHTML = `
+      <table class="historial-propinas" id="tabla-clientes">
+        <tr">
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>DNI</th>
+          <th>Acciones</th>
+        </tr>
+      </table>
+      `;
+      textoDatosPersonales.insertAdjacentHTML("afterend", tablaClientesHTML);
+
+
+  for (let i = 0; i < clientes.length; i++) {
+    let trDatosClientes = document.createElement("tr");
+        datos = `
+                  <td>${clientes[i].nombre}</td>
+                  <td>${clientes[i].apellido}</td>
+                  <td>${clientes[i].dni}</td>
+              `;
+    trDatosClientes.classList.add("datos-clientes");
+    trDatosClientes.innerHTML = datos;
+    document.getElementById("tabla-clientes").appendChild(trDatosClientes);
+  }
+}
 
 // ---- Registro de datos personales ----
 
@@ -144,7 +179,7 @@ function almacenarCliente(nombre, apellido, dni) {
   let cliente = new Cliente(nombre, apellido, dni);
   localStorage.setItem('cliente', JSON.stringify(cliente));
   textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">cambiar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.\n¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> e iniciar sesión`;
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
   generarEventoBorrarHistorialYPropinas();
@@ -450,6 +485,8 @@ function existeCliente() {
   if (localStorage.getItem('cliente') !== null) {
     completarDatosCliente();
     existenPropinas();
+  } else {
+    existenClientes();
   }
 }
 

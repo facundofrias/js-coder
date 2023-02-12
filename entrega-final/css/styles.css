@@ -43,26 +43,33 @@ input[type=number] {
 
 /* ------ Historial de propinas ------ */
 
+.lista-clientes,
 .historial-propinas {
   border-collapse: collapse;
   width: 100%;
 }
 
+.lista-clientes td, .lista-clientes th,
 .historial-propinas td, .historial-propinas th {
   border: 1px solid #a1a1a1;
   padding: 4px;
 }
 
+.datos-clientes,
 .datos-propinas {
   background-color: #f2f2f2;
 }
-
+.datos-clientes:hover,
 .datos-propinas:hover {
   background-color: #ddd;
 }
 
-.historial-propinas tr:hover {background-color: #ddd;}
+.lista-clientes tr:hover,
+.historial-propinas tr:hover {
+  background-color: #ddd;
+}
 
+.lista-clientes th,
 .historial-propinas th {
   text-align: center;
   background-color: #04AA6D;
