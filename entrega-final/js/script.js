@@ -91,7 +91,7 @@ btnSiguiente.addEventListener("click", generarComensales);
 // ----- FUNCIONES -----
 
 function cambiarTextoDatosPersonales() {
-  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas. <br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> e iniciar sesión.`;
+  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas. <br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos.`;
   let btnlistaClientes = document.getElementById("lista-clientes");
   datosRegistro = document.getElementById("registro-datos");
 
@@ -110,13 +110,13 @@ function cargarListaClientes() {
     document.getElementById("tabla-clientes").remove();
   }
   let tablaClientesHTML = `
-
       <table class="lista-clientes" id="tabla-clientes">
         <tr>
           <th>Nombre</th>
           <th>Apellido</th>
           <th>DNI</th>
           <th>Acciones</th>
+          <th class""><a class="btn-cerrar" id="btn-cerrar-tabla">x</a></th>
         </tr>
       </table>
       `;
@@ -146,6 +146,7 @@ function mostrarDatosRegistro() {
   if (!document.getElementById("datos-personales")) {
     let formDatosPersonales = `
           <div class="datos-personales" id="datos-personales">
+          <a class="btn-cerrar" id="btn-cerrar-registro">x</a>
             <label class="field__title">Nombre/s:</label>
             <input class="field-datos" type="text" id="nombre">
             <label class="field__title">Apellido/s:</label>
@@ -154,14 +155,23 @@ function mostrarDatosRegistro() {
             <input class="field-datos" type="text" id="dni">
             <button class="btn-registro" id="btn-registro">Registrarse</button>
           </div>
-          `;
+          `,
+          btnCerrarRegistro;
           
     textoDatosPersonales.insertAdjacentHTML("afterend", formDatosPersonales);
     // Se dispara cuando se pretende efectuar registro de cliente
     document.getElementById("btn-registro").addEventListener("click", validarRegistro);
   }
     document.getElementById("nombre").focus();
-}   
+
+    document.getElementById("btn-cerrar-registro").addEventListener("click", () => {
+      cerrarDiv("btn-cerrar-registro");
+    });
+}
+
+function cerrarDiv(id) {
+  document.getElementById(id).parentElement.remove();
+}
 
 // Valida que los datos ingresados en el formulario de registro sean válidos
 function validarRegistro() {
@@ -191,7 +201,7 @@ function almacenarCliente(nombre, apellido, dni) {
   let cliente = new Cliente(nombre, apellido, dni);
   localStorage.setItem('cliente', JSON.stringify(cliente));
   textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.\n¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> e iniciar sesión`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.\n¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos`;
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
   generarEventoBorrarHistorialYPropinas();

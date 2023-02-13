@@ -38,6 +38,16 @@ input[type=number] {
   display: none !important;
 }
 
+.btn-cerrar {
+  align-self: flex-end;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.btn-cerrar:hover {
+  color: #a91b1b;
+}
+
 /* ------ Fin GLOBALES ------ */
 
 
@@ -89,6 +99,11 @@ input[type=number] {
 
 .datos-personales {
   margin-bottom: 1.5rem;
+  padding: 5px;
+  padding-top: 0;
+  max-width: 15rem;
+  border: 1px solid black;
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
 }
