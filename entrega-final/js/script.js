@@ -90,6 +90,98 @@ btnSiguiente.addEventListener("click", generarComensales);
 
 // ----- FUNCIONES -----
 
+// ---- Clientes ----
+
+function cargarListaClientes() {
+  if(document.getElementById("datos-personales")) {
+    document.getElementById("datos-personales").remove();
+  }
+  if(document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").remove();
+  }
+  let tablaClientesHTML = `
+      <table class="tabla-clientes" id="tabla-clientes">
+        <tr class="encabezado-tabla">
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>DNI</th>
+          <th>Acciones</th>
+          <th class="th-cerrar-tabla"><a class="btn-remover" id="btn-cerrar-tabla-clientes" title="Cerrar tabla"><i class="fa-solid fa-xmark"></i></a></th>          
+        </tr>
+      </table>
+      `;
+      textoDatosPersonales.insertAdjacentHTML("afterend", tablaClientesHTML);
+
+
+  for (let i = 0; i < clientes.length; i++) {
+    let trDatosClientes = document.createElement("tr");
+        datos = `
+                <td>${clientes[i].nombre}</td>
+                <td>${clientes[i].apellido}</td>
+                <td>${clientes[i].dni}</td>
+                <td class="acciones">
+                  <a class="btn-login" title="Cambiar cliente"><i class="fa-solid fa-right-to-bracket"></i></a>
+                  <a class="btn-editar" title="Editar"><i class="fa-solid fa-user-pen"></i></i></a>
+                  <a class="btn-remover-cliente" title="Eliminar"><i class="fa-solid fa-user-xmark"></i></i></a>
+                </td>                  
+              `;
+    trDatosClientes.classList.add("datos-clientes");
+    trDatosClientes.innerHTML = datos;
+    document.getElementById("tabla-clientes").appendChild(trDatosClientes);
+  }
+  document.getElementById("btn-cerrar-tabla-clientes").addEventListener("click", () => {
+    removerElemento("btn-cerrar-tabla-clientes");
+    removerElemento("tabla-clientes");
+  });
+  if (document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").addEventListener("click", (event) => {
+      let dni = event.target.parentElement.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent;
+      if(event.target.parentElement.className == "btn-login") {
+        completarDatosCliente(obtenerCliente(dni));
+      }
+      if(event.target.parentElement.className == "btn-editar") {
+        editarCliente(dni);
+      }
+      if(event.target.parentElement.className == "btn-remover-cliente") {
+        removerCliente(dni);
+        clientes.length > 0 ? cargarListaClientes() : removerElemento("tabla-clientes");
+      }
+    });
+  }
+}
+
+// ---- Cllientes - Registro de datos personales ----
+
+// Muestra el div contenedor del formulario de datos personales
+function mostrarDatosRegistro() {
+  if(document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").remove();
+  }
+  if (!document.getElementById("datos-personales")) {
+    let formDatosPersonales = `
+          <div class="datos-personales" id="datos-personales">
+            <a class="btn-remover" id="btn-cerrar-registro" title="Cerrar formulario"><i class="fa-solid fa-xmark"></i></i></a>
+            <label class="field__title">Nombre/s:</label>
+            <input class="field-datos" type="text" id="nombre">
+            <label class="field__title">Apellido/s:</label>
+            <input class="field-datos" type="text" id="apellido">
+            <label class="field__title">DNI:</label>
+            <input class="field-datos" type="text" id="dni">
+            <button class="btn-registro" id="btn-registro">Registrarse</button>
+          </div>
+          `;
+          
+    textoDatosPersonales.insertAdjacentHTML("afterend", formDatosPersonales);
+    // Se dispara cuando se pretende efectuar registro de cliente
+    document.getElementById("btn-registro").addEventListener("click", validarRegistro);
+  }
+    document.getElementById("nombre").focus();
+
+    document.getElementById("btn-cerrar-registro").addEventListener("click", () => {
+      removerElemento("datos-personales");
+    });
+}
+
 function cambiarTextoDatosPersonales() {
   textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas. <br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos.`;
   let btnlistaClientes = document.getElementById("lista-clientes");
@@ -100,77 +192,6 @@ function cambiarTextoDatosPersonales() {
 
   // Se dispara cuando se pretende completar datos
   datosRegistro.addEventListener("click", mostrarDatosRegistro);
-}
-
-function cargarListaClientes() {
-  if(document.getElementById("datos-personales")) {
-    document.getElementById("datos-personales").remove();
-  }
-  if(document.getElementById("tabla-clientes")) {
-    document.getElementById("tabla-clientes").remove();
-  }
-  let tablaClientesHTML = `
-      <table class="lista-clientes" id="tabla-clientes">
-        <tr>
-          <th>Nombre</th>
-          <th>Apellido</th>
-          <th>DNI</th>
-          <th>Acciones</th>
-          <th class""><a class="btn-cerrar" id="btn-cerrar-tabla">x</a></th>
-        </tr>
-      </table>
-      `;
-      textoDatosPersonales.insertAdjacentHTML("afterend", tablaClientesHTML);
-
-
-  for (let i = 0; i < clientes.length; i++) {
-    let trDatosClientes = document.createElement("tr");
-        datos = `
-                  <td>${clientes[i].nombre}</td>
-                  <td>${clientes[i].apellido}</td>
-                  <td>${clientes[i].dni}</td>
-              `;
-    trDatosClientes.classList.add("datos-clientes");
-    trDatosClientes.innerHTML = datos;
-    document.getElementById("tabla-clientes").appendChild(trDatosClientes);
-  }
-}
-
-// ---- Registro de datos personales ----
-
-// Muestra el div contenedor del formulario de datos personales
-function mostrarDatosRegistro() {
-  if(document.getElementById("tabla-clientes")) {
-    document.getElementById("tabla-clientes").remove();
-  }
-  if (!document.getElementById("datos-personales")) {
-    let formDatosPersonales = `
-          <div class="datos-personales" id="datos-personales">
-          <a class="btn-cerrar" id="btn-cerrar-registro">x</a>
-            <label class="field__title">Nombre/s:</label>
-            <input class="field-datos" type="text" id="nombre">
-            <label class="field__title">Apellido/s:</label>
-            <input class="field-datos" type="text" id="apellido">
-            <label class="field__title">DNI:</label>
-            <input class="field-datos" type="text" id="dni">
-            <button class="btn-registro" id="btn-registro">Registrarse</button>
-          </div>
-          `,
-          btnCerrarRegistro;
-          
-    textoDatosPersonales.insertAdjacentHTML("afterend", formDatosPersonales);
-    // Se dispara cuando se pretende efectuar registro de cliente
-    document.getElementById("btn-registro").addEventListener("click", validarRegistro);
-  }
-    document.getElementById("nombre").focus();
-
-    document.getElementById("btn-cerrar-registro").addEventListener("click", () => {
-      cerrarDiv("btn-cerrar-registro");
-    });
-}
-
-function cerrarDiv(id) {
-  document.getElementById(id).parentElement.remove();
 }
 
 // Valida que los datos ingresados en el formulario de registro sean válidos
@@ -205,21 +226,43 @@ function almacenarCliente(nombre, apellido, dni) {
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
   generarEventoBorrarHistorialYPropinas();
+  
+  // Se dispara cuando se quiere desplegar la lista de clientes
+  document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
 }
 
 // Completa los datos del cliente en el formulario 
 // Reemplaza el texto del botón de registro por "Cambiar"
 // Reemplaza el texto de bienvenida a la app
-function completarDatosCliente() {
-  let c = JSON.parse(localStorage.getItem('cliente'));
+function completarDatosCliente(c) {
   document.getElementById("texto-bienvenida").textContent = `¡Te damos la bienvenida nuevamente, ${c.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">cambiar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, si ya sos cliente podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos; o simplemente utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.`;
   
   // Se dispara cuando se pretende completar datos
-  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
-  generarEventoBorrarHistorialYPropinas();
+  // document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
+  // generarEventoBorrarHistorialYPropinas();
+
+  // Se dispara cuando se quiere desplegar la lista de clientes
+  document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
 }
 
+// Elimina cliente
+function removerCliente(dni) {
+  for (let i = 0; i < clientes.length; i++) {
+    if(clientes[i].dni == dni) {
+      clientes.splice(i,1);
+      break;
+    }
+  }
+}
+
+function obtenerCliente(dni) {
+  for (let i = 0; i < clientes.length; i++) {
+    if(clientes[i].dni == dni) {
+      return clientes[i];
+    }
+  }
+}
 
 // ---- Propina ----
 
@@ -254,10 +297,10 @@ function generarComensales() {
   if (validarCamposPropina()) {
     // Declaración de variables
     const contenedorCalculoPropina = document.createElement("div"),
-        tituloMontosComensales = document.createElement("h3"),
-        montos = document.createElement("div"),
-        btnCalcularPropina = document.createElement("button"),
-        btnNuevaPropina = document.createElement("button");
+          tituloMontosComensales = document.createElement("h3"),
+          montos = document.createElement("div"),
+          btnCalcularPropina = document.createElement("button"),
+          btnNuevaPropina = document.createElement("button");
         
   limpiarPropina();
   
@@ -336,7 +379,6 @@ function validarMontosComensales() {
     for (let i = 0; i < nombresDatosInvalidos.length; i++) {
       montosErroneos = montosErroneos + `${nombresDatosInvalidos[i]}<br/>`;
     }
-    console.log(nombresDatosInvalidos.length);
     if(montosErroneos !== `Existen datos erróneos, estos se encuentran en:<br/>`) {
       Swal.fire({
         icon: 'error',
@@ -505,7 +547,7 @@ function generarEventoBorrarHistorialYPropinas() {
 // Verifica si existe cliente y completa los datos personales
 function existeCliente() {
   if (localStorage.getItem('cliente') !== null) {
-    completarDatosCliente();
+    completarDatosCliente(JSON.parse(localStorage.getItem('cliente')));
     existenPropinas();
   } else {
     existenClientes();
@@ -562,4 +604,8 @@ function validarNumeroEntero(valor) {
   // } else {
   //   return true;
   // }
+}
+
+function removerElemento(id) {
+  document.getElementById(id).remove();
 }

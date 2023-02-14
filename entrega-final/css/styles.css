@@ -38,14 +38,21 @@ input[type=number] {
   display: none !important;
 }
 
-.btn-cerrar {
+.btn-editar,
+.btn-remover-cliente,
+.btn-remover {
   align-self: flex-end;
   font-size: 18px;
   text-decoration: none;
 }
 
-.btn-cerrar:hover {
+.btn-remover-cliente:hover,
+.btn-remover:hover {
   color: #a91b1b;
+}
+
+.btn-editar:hover {
+  color: hsl(61, 89%, 37%);
 }
 
 /* ------ Fin GLOBALES ------ */
@@ -53,13 +60,13 @@ input[type=number] {
 
 /* ------ Historial de propinas ------ */
 
-.lista-clientes,
+.tabla-clientes,
 .historial-propinas {
   border-collapse: collapse;
   width: 100%;
 }
 
-.lista-clientes td, .lista-clientes th,
+.tabla-clientes td, .tabla-clientes th,
 .historial-propinas td, .historial-propinas th {
   border: 1px solid #a1a1a1;
   padding: 4px;
@@ -74,17 +81,41 @@ input[type=number] {
   background-color: #ddd;
 }
 
-.lista-clientes tr:hover,
+.tabla-clientes tr:hover,
 .historial-propinas tr:hover {
   background-color: #ddd;
 }
 
-.lista-clientes th,
+.tabla-clientes .encabezado-tabla:hover {
+  background-color: transparent;
+}
+
+.tabla-clientes th,
 .historial-propinas th {
   text-align: center;
   background-color: #04AA6D;
   color: white;
 }
+
+.tabla-clientes .th-cerrar-tabla {
+  background-color: transparent;
+  color: black;
+  border: none;
+}
+
+
+.tabla-clientes .th-cerrar-tabla:hover {
+  background-color: transparent;
+}
+
+.acciones {
+  text-align: center;
+}
+
+.acciones a {
+  margin: 0 7px;
+}
+
 
 .data {
   text-align: center;
@@ -100,7 +131,7 @@ input[type=number] {
 .datos-personales {
   margin-bottom: 1.5rem;
   padding: 5px;
-  padding-top: 0;
+  padding-top: 1px;
   max-width: 15rem;
   border: 1px solid black;
   border-radius: 4px;
