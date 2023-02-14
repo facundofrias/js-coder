@@ -67,6 +67,7 @@ const existenClientes = async () => {
   const resp = await fetch('clientes.json');
   const data = await resp.json();
   if(data.length > 0) {
+    clientes = [];
     await data.forEach( (element) => {
       clientes.push(element);
     });
@@ -150,7 +151,7 @@ function cargarListaClientes() {
   }
 }
 
-// ---- Cllientes - Registro de datos personales ----
+// ---- Clientes - Registro de datos personales ----
 
 // Muestra el div contenedor del formulario de datos personales
 function mostrarDatosRegistro() {
@@ -183,7 +184,14 @@ function mostrarDatosRegistro() {
 }
 
 function cambiarTextoDatosPersonales() {
-  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas. <br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos.`;
+  if(localStorage.getItem("clienteLogueado")) {
+    let cliente = JSON.parse(localStorage.getItem("clienteLogueado"));
+    completarDatosCliente(cliente);
+  } else {
+      textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.<br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos.`;
+  }
+
+
   let btnlistaClientes = document.getElementById("lista-clientes");
   datosRegistro = document.getElementById("registro-datos");
 
@@ -220,15 +228,18 @@ function almacenarCliente(nombre, apellido, dni) {
   }
   borrarDatosClienteYPropinas();
   let cliente = new Cliente(nombre, apellido, dni);
-  localStorage.setItem('cliente', JSON.stringify(cliente));
   textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.\n¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos`;
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
   generarEventoBorrarHistorialYPropinas();
   
   // Se dispara cuando se quiere desplegar la lista de clientes
   document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
+  console.log(clientes);
+  console.log("-----------------------")
+  clientes.push(cliente);
+  console.log(clientes);
 }
 
 // Completa los datos del cliente en el formulario 
@@ -236,14 +247,19 @@ function almacenarCliente(nombre, apellido, dni) {
 // Reemplaza el texto de bienvenida a la app
 function completarDatosCliente(c) {
   document.getElementById("texto-bienvenida").textContent = `¡Te damos la bienvenida nuevamente, ${c.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, si ya sos cliente podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos; o simplemente utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; si ya sos cliente podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>;`;
   
   // Se dispara cuando se pretende completar datos
   // document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
-  // generarEventoBorrarHistorialYPropinas();
+  generarEventoBorrarHistorialYPropinas();
 
   // Se dispara cuando se quiere desplegar la lista de clientes
   document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
+
+  if(document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").remove();
+  }
+  localStorage.setItem("clienteLogueado", JSON.stringify(c));
 }
 
 // Elimina cliente
@@ -422,8 +438,9 @@ function calcularMontoTotalYPropina() {
 
 // Almacena propina asociada a cliente
 function almacenarPropina(propina) {
-  if (localStorage.getItem('cliente') !== null) {
-    let cliente = JSON.parse(localStorage.getItem('cliente')),
+  // Verifica si hay cliente logueado o si es propina anónima
+  if (localStorage.getItem("clienteLogueado") !== null) {
+    let cliente = JSON.parse(localStorage.getItem("clienteLogueado")),
         propinas = [];
     if(localStorage.getItem("propinas") !== null) {    
       propinas = JSON.parse(localStorage.getItem('propinas')); 
@@ -432,9 +449,9 @@ function almacenarPropina(propina) {
     localStorage.setItem("propinas", JSON.stringify(propinas));
     propinas = JSON.parse(localStorage.getItem('propinas'));
     
-    // Almacena las propinas en Cliente y luego lo guarda en localStorage 
+    // Almacena las propinas en Cliente y luego actualiza cliente actual en localStorage 
     cliente.propinas.push(propina);
-    localStorage.setItem("cliente", JSON.stringify(cliente));
+    localStorage.setItem("clienteLogueado", JSON.stringify(cliente));
     
     // Si la cantidad de propinas almacenadas es igual a 5, borra la útima
     if(propinas.length == 1) {
@@ -546,12 +563,11 @@ function generarEventoBorrarHistorialYPropinas() {
 
 // Verifica si existe cliente y completa los datos personales
 function existeCliente() {
-  if (localStorage.getItem('cliente') !== null) {
-    completarDatosCliente(JSON.parse(localStorage.getItem('cliente')));
+  if (localStorage.getItem("clienteLogueado") !== null) {
+    completarDatosCliente(JSON.parse(localStorage.getItem("clienteLogueado")));
     existenPropinas();
-  } else {
-    existenClientes();
   }
+  existenClientes();
 }
 
 // Verifica si existen propinas asociadas a cliente y completa el historial de clientes
@@ -564,13 +580,14 @@ function existenPropinas() {
 
 // Limpia el local storage permitiendo que la app tenga su html nativo
 function limpiarStorage() {
-  localStorage.removeItem('cliente');
-  localStorage.removeItem('propinas');
+  localStorage.removeItem("clienteLogueado");
+  localStorage.removeItem("propinas");
+  existenClientes();
 }
 
 function refrescar() {
   textoBienvenida.textContent = "¡Te damos la bienvenida!";
-  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, así recordaremos tus últimas 5 propinas calculadas.`;
+  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.`;
 
   if(document.getElementById("datos-personales")) {
     document.getElementById("datos-personales").remove();

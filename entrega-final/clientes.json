@@ -8,5 +8,10 @@
     "nombre": "Enzo",
     "apellido": "Fernandez",
     "dni": 41001
+  },
+  {
+    "nombre": "Facu",
+    "apellido": "Frias",
+    "dni": 42311
   }
 ]
