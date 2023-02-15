@@ -2,16 +2,19 @@
   {
     "nombre": "Julian",
     "apellido": "Alvarez",
-    "dni": 40123
+    "dni": 40123,
+    "propinas": []
   },
   {
     "nombre": "Enzo",
     "apellido": "Fernandez",
-    "dni": 41001
+    "dni": 41001,
+    "propinas": []
   },
   {
     "nombre": "Facu",
     "apellido": "Frias",
-    "dni": 42311
+    "dni": 42311,
+    "propinas": []
   }
 ]

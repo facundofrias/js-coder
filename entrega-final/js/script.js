@@ -217,6 +217,15 @@ function validarRegistro() {
       text: '¡Datos personales erróneos o incompletos!'
     });
   }
+  let c = new Cliente(nombre, apellido, dni);
+  const fs = require('fs');
+  fileSystem.writeFile("./cliente.json", c, err=>{
+    if(err){
+      console.log("Error writing file" ,err)
+    } else {
+      console.log('JSON data is written to the file successfully')
+    }
+   })
 }
 
 // Almacena cliente
@@ -236,10 +245,7 @@ function almacenarCliente(nombre, apellido, dni) {
   
   // Se dispara cuando se quiere desplegar la lista de clientes
   document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
-  console.log(clientes);
-  console.log("-----------------------")
   clientes.push(cliente);
-  console.log(clientes);
 }
 
 // Completa los datos del cliente en el formulario 
@@ -250,7 +256,6 @@ function completarDatosCliente(c) {
   textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; si ya sos cliente podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>;`;
   
   // Se dispara cuando se pretende completar datos
-  // document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
   generarEventoBorrarHistorialYPropinas();
 
   // Se dispara cuando se quiere desplegar la lista de clientes
@@ -382,7 +387,7 @@ function generarComensales() {
 function validarMontosComensales() {
   let montosComensales = document.getElementsByClassName("field"),
       nombresDatosInvalidos = [],
-      montosErroneos = `Existen datos erróneos, estos se encuentran en:\n`;
+      montosErroneos = `Existen datos erróneos, estos se encuentran en:<br/>`;
 
   if (montosComensales.length == document.getElementById("cantidad-comensales").value) {
     for (let i = 0; i < montosComensales.length; i++) {
@@ -517,7 +522,7 @@ function limpiarPropina() {
 function borrarDatosPropina() {
   if(document.getElementById("contenedor-calculo-propina")) {
     document.getElementById("contenedor-calculo-propina").remove();
-    limpiarCamposPropina();
+    vaciarCamposPropina();
     propina = new Propina();
   }
 }
@@ -529,7 +534,7 @@ function limpiarListaHistorialPropinas() {
   });
 }
 
-function limpiarCamposPropina() {
+function vaciarCamposPropina() {
   porcentajePropina.value = "";
   cantidadComensales.value = "";
   cantidadComensales.focus();
@@ -541,9 +546,15 @@ function borrarDatosClienteYPropinas() {
   borrarHistorialPropinas();
   borrarDatosPropina();
   refrescar();
-  limpiarCamposPropina();
+  borrarFormDatosPersonales();
+  vaciarCamposPropina();
+}
 
-  // window.location.reload();
+// Borra el form de datos personales
+function borrarFormDatosPersonales(){
+  if(document.getElementById("datos-personales")) {
+    document.getElementById("datos-personales").remove();
+  }
 }
 
 // Borra la tabla de Historial de propinas
@@ -589,14 +600,9 @@ function refrescar() {
   textoBienvenida.textContent = "¡Te damos la bienvenida!";
   textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.`;
 
-  if(document.getElementById("datos-personales")) {
-    document.getElementById("datos-personales").remove();
-  }
-
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
 }
-
 
 // Suprime los ".00" de los números float
 function sinCeros(num) {
@@ -606,21 +612,11 @@ function sinCeros(num) {
 // Determina que el valor ingresado sea numérico positivo
 function validarNumero(valor) {
   return (!isNaN(valor) &&  Number(valor) > 0);
-  // if (isNaN(valor) || Number(valor) <= 0) {
-  //   return false;
-  // } else {
-  //   return true;
-  // }
 }
 
 // Determina que el valor ingresado sea numérico y entero positivo
 function validarNumeroEntero(valor) {
   return (!isNaN(Number(valor)) );
-  // if (isNaN(valor) || Number(valor) <= 0 || !Number.isInteger(Number(valor))) {
-  //   return false;
-  // } else {
-  //   return true;
-  // }
 }
 
 function removerElemento(id) {
