@@ -97,9 +97,7 @@ function cargarListaClientes() {
   if(document.getElementById("datos-personales")) {
     document.getElementById("datos-personales").remove();
   }
-  if(document.getElementById("tabla-clientes")) {
-    document.getElementById("tabla-clientes").remove();
-  }
+  borrarTablaClientes();
   let tablaClientesHTML = `
       <table class="tabla-clientes" id="tabla-clientes">
         <tr class="encabezado-tabla">
@@ -137,7 +135,7 @@ function cargarListaClientes() {
     document.getElementById("tabla-clientes").addEventListener("click", (event) => {
       let dni = event.target.parentElement.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent;
       if(event.target.parentElement.className == "btn-login") {
-        completarDatosCliente(obtenerCliente(dni));
+        cambiarCliente(dni);
       }
       if(event.target.parentElement.className == "btn-editar") {
         editarCliente(dni);
@@ -154,9 +152,7 @@ function cargarListaClientes() {
 
 // Muestra el div contenedor del formulario de datos personales
 function mostrarDatosRegistro() {
-  if(document.getElementById("tabla-clientes")) {
-    document.getElementById("tabla-clientes").remove();
-  }
+  borrarTablaClientes();
   if (!document.getElementById("datos-personales")) {
     let formDatosPersonales = `
           <div class="datos-personales" id="datos-personales">
@@ -187,7 +183,7 @@ function cambiarTextoDatosPersonales() {
     let cliente = JSON.parse(localStorage.getItem("clienteLogueado"));
     completarDatosCliente(cliente);
   } else {
-      textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.<br> ¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos.`;
+      textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.<br> ¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos.`;
   }
 
 
@@ -216,15 +212,6 @@ function validarRegistro() {
       text: '¡Datos personales erróneos o incompletos!'
     });
   }
-  let c = new Cliente(nombre, apellido, dni);
-  const fs = require('fs');
-  fileSystem.writeFile("./cliente.json", c, err=>{
-    if(err){
-      console.log("Error writing file" ,err)
-    } else {
-      console.log('JSON data is written to the file successfully')
-    }
-   })
 }
 
 // Almacena cliente
@@ -237,14 +224,16 @@ function almacenarCliente(nombre, apellido, dni) {
   borrarDatosClienteYPropinas();
   let cliente = new Cliente(nombre, apellido, dni);
   textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Entonces podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos`;
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
+  
   generarEventoBorrarHistorialYPropinas();
   
   // Se dispara cuando se quiere desplegar la lista de clientes
   document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
   clientes.push(cliente);
+  localStorage.setItem("clienteLogueado", JSON.stringify(cliente));
 }
 
 // Completa los datos del cliente en el formulario 
@@ -252,7 +241,7 @@ function almacenarCliente(nombre, apellido, dni) {
 // Reemplaza el texto de bienvenida a la app
 function completarDatosCliente(c) {
   document.getElementById("texto-bienvenida").textContent = `¡Te damos la bienvenida nuevamente, ${c.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; si ya sos cliente podés desplegar la <a id="lista-clientes">lista de clientes</a> y cargar tus datos; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>;`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos`;
   
   // Se dispara cuando se pretende completar datos
   generarEventoBorrarHistorialYPropinas();
@@ -260,10 +249,17 @@ function completarDatosCliente(c) {
   // Se dispara cuando se quiere desplegar la lista de clientes
   document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
 
-  if(document.getElementById("tabla-clientes")) {
-    document.getElementById("tabla-clientes").remove();
-  }
+  borrarTablaClientes();
   localStorage.setItem("clienteLogueado", JSON.stringify(c));
+}
+
+// Cambia cliente (inicio de sesión)
+function cambiarCliente(dni) {
+  if(document.getElementById("tabla-propinas")) {
+    document.getElementById("tabla-propinas").remove();
+    localStorage.removeItem("propinas");
+  }
+  completarDatosCliente(obtenerCliente(dni));
 }
 
 // Elimina cliente
@@ -273,6 +269,13 @@ function removerCliente(dni) {
       clientes.splice(i,1);
       break;
     }
+  }
+}
+
+// Borra la tabla de clientes en caso de estar desplegada
+function borrarTablaClientes() {
+  if(document.getElementById("tabla-clientes")) {
+    document.getElementById("tabla-clientes").remove();
   }
 }
 
@@ -592,12 +595,16 @@ function existenPropinas() {
 function limpiarStorage() {
   localStorage.removeItem("clienteLogueado");
   localStorage.removeItem("propinas");
-  existenClientes();
 }
 
 function refrescar() {
   textoBienvenida.textContent = "¡Te damos la bienvenida!";
-  textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.`;
+  if(clientes.length > 0) {
+    textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas.<br> ¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos.`;
+  } else {
+    borrarTablaClientes();
+    textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas.`;
+  }
 
   // Se dispara cuando se pretende completar datos
   document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
