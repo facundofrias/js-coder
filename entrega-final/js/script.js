@@ -122,7 +122,6 @@ function cargarListaClientes() {
                 <td>${clientes[i].dni}</td>
                 <td class="acciones">
                   <a class="btn-login" title="Cambiar cliente"><i class="fa-solid fa-right-to-bracket"></i></a>
-                  <a class="btn-editar" title="Editar"><i class="fa-solid fa-user-pen"></i></i></a>
                   <a class="btn-remover-cliente" title="Eliminar"><i class="fa-solid fa-user-xmark"></i></i></a>
                 </td>                  
               `;
