@@ -71,7 +71,9 @@ const existenClientes = async () => {
     await data.forEach( (element) => {
       clientes.push(element);
     });
-    cambiarTextoDatosPersonales();
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -87,6 +89,9 @@ datosRegistro.addEventListener("click", mostrarDatosRegistro);
 
 // Se dispara cuando se establecieron valores en campos de porcentaje propina y cantidad de comensales
 btnSiguiente.addEventListener("click", generarComensales);
+
+
+// ----- MAIN -----
 
 
 // ----- FUNCIONES -----
@@ -111,7 +116,6 @@ function cargarListaClientes() {
       `;
       textoDatosPersonales.insertAdjacentHTML("afterend", tablaClientesHTML);
 
-
   for (let i = 0; i < clientes.length; i++) {
     let trDatosClientes = document.createElement("tr");
         datos = `
@@ -133,22 +137,21 @@ function cargarListaClientes() {
   });
   if (document.getElementById("tabla-clientes")) {
     document.getElementById("tabla-clientes").addEventListener("click", (event) => {
-      let dni = event.target.parentElement.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent;
-      if(event.target.parentElement.className == "btn-login") {
-        cambiarCliente(dni);
-      }
-      if(event.target.parentElement.className == "btn-editar") {
-        editarCliente(dni);
-      }
-      if(event.target.parentElement.className == "btn-remover-cliente") {
-        removerCliente(dni);
-        clientes.length > 0 ? cargarListaClientes() : removerElemento("tabla-clientes");
+      if(event.target.nodeName == "I") {
+        let dni = event.target.parentElement.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.textContent;
+        if(event.target.parentElement.className == "btn-login") {
+          cambiarCliente(dni);
+        }
+        if(event.target.parentElement.className == "btn-remover-cliente") {
+          removerCliente(dni);
+          clientes.length > 0 ? cargarListaClientes() : removerElemento("tabla-clientes");
+        }
       }
     });
   }
 }
 
-// ---- Clientes - Registro de datos personales ----
+// ---- Clientes - Datos personales ----
 
 // Muestra el div contenedor del formulario de datos personales
 function mostrarDatosRegistro() {
@@ -178,31 +181,12 @@ function mostrarDatosRegistro() {
     });
 }
 
-function cambiarTextoDatosPersonales() {
-  if(localStorage.getItem("clienteLogueado")) {
-    let cliente = JSON.parse(localStorage.getItem("clienteLogueado"));
-    completarDatosCliente(cliente);
-  } else {
-      textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas calculadas.<br> ¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos.`;
-  }
-
-
-  let btnlistaClientes = document.getElementById("lista-clientes");
-  datosRegistro = document.getElementById("registro-datos");
-
-  // Se dispara cuando se quiere desplegar la lista de clientes
-  btnlistaClientes.addEventListener("click", cargarListaClientes);
-
-  // Se dispara cuando se pretende completar datos
-  datosRegistro.addEventListener("click", mostrarDatosRegistro);
-}
-
 // Valida que los datos ingresados en el formulario de registro sean válidos
 function validarRegistro() {
   const nombre = document.getElementById("nombre").value,
         apellido = document.getElementById("apellido").value,
         dni = document.getElementById("dni").value;
-
+        
   if ((nombre !== '') && (apellido !== '') && (validarNumeroEntero(Number(dni)))) {
     almacenarCliente(nombre, apellido, dni);
   } else {
@@ -211,6 +195,13 @@ function validarRegistro() {
       title: '¡Error!',
       text: '¡Datos personales erróneos o incompletos!'
     });
+  }
+}
+
+// Borra el form de datos personales
+function borrarFormDatosPersonales(){
+  if(document.getElementById("datos-personales")) {
+    document.getElementById("datos-personales").remove();
   }
 }
 
@@ -224,14 +215,14 @@ function almacenarCliente(nombre, apellido, dni) {
   borrarDatosClienteYPropinas();
   let cliente = new Cliente(nombre, apellido, dni);
   textoBienvenida.textContent = `¡Te damos la bienvenida, ${cliente.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos`;
-  // Se dispara cuando se pretende completar datos
-  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${cliente.nombre} ${cliente.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Desplegá la <a id="btn-lista-clientes">lista de clientes</a> y cargá tus datos`;
+  // Se dispara cuando se pretende completar datos de registro
+  generarListenerMostrarDatosRegistro();
   
-  generarEventoBorrarHistorialYPropinas();
+  generarListenerBorrarHistorialYPropinas();
   
   // Se dispara cuando se quiere desplegar la lista de clientes
-  document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
+  generarListenerMostrarListaClientes();
   clientes.push(cliente);
   localStorage.setItem("clienteLogueado", JSON.stringify(cliente));
 }
@@ -241,16 +232,20 @@ function almacenarCliente(nombre, apellido, dni) {
 // Reemplaza el texto de bienvenida a la app
 function completarDatosCliente(c) {
   document.getElementById("texto-bienvenida").textContent = `¡Te damos la bienvenida nuevamente, ${c.nombre}!`;
-  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos`;
+  textoDatosPersonales.innerHTML = `¿No sos <strong>${c.nombre} ${c.apellido}</strong>? No te preocupes, podés <a id="registro-datos">registrar</a> tus datos personales; o utilizar la app de manera anónima haciendo clic <a id="anonima">acá</a>.<br>¿Ya sos cliente? Desplegá la <a id="btn-lista-clientes">lista de clientes</a> y cargá tus datos`;
   
   // Se dispara cuando se pretende completar datos
-  generarEventoBorrarHistorialYPropinas();
+  generarListenerBorrarHistorialYPropinas();
 
   // Se dispara cuando se quiere desplegar la lista de clientes
-  document.getElementById("lista-clientes").addEventListener("click", cargarListaClientes);
+  generarListenerMostrarListaClientes();
+
+  // Se dispara cuando se pretende completar datos de registro
+  generarListenerMostrarDatosRegistro();
 
   borrarTablaClientes();
   localStorage.setItem("clienteLogueado", JSON.stringify(c));
+  existenPropinas();
 }
 
 // Cambia cliente (inicio de sesión)
@@ -439,6 +434,7 @@ function calcularMontoTotalYPropina() {
   propina.totalPropina = sinCeros(propina.totalCuenta * (propina.porcentajePropina / 100));
   document.getElementById("monto-total").textContent = `Monto total a pagar: $${propina.totalCuenta}`;
   document.getElementById("propina-total").textContent = `Propina total: $${propina.totalPropina}`;
+
   // Llamado a la función que muestra el historial de propinas
   almacenarPropina(propina);
 }
@@ -552,13 +548,6 @@ function borrarDatosClienteYPropinas() {
   vaciarCamposPropina();
 }
 
-// Borra el form de datos personales
-function borrarFormDatosPersonales(){
-  if(document.getElementById("datos-personales")) {
-    document.getElementById("datos-personales").remove();
-  }
-}
-
 // Borra la tabla de Historial de propinas
 function borrarHistorialPropinas() {
   if(document.getElementById("titulo-historial-propinas") !== null) {
@@ -567,27 +556,33 @@ function borrarHistorialPropinas() {
   }
 }
 
-// Dispara un evento que se ejecuta cuando se hace clic sobre "anónima"
-function generarEventoBorrarHistorialYPropinas() {
-  document.getElementById("anonima").addEventListener("click", borrarDatosClienteYPropinas);
-}
 
 // ----- Funciones de utilidad -----
 
 // Verifica si existe cliente y completa los datos personales
 function existeCliente() {
+  if(existenClientes()) {
+    textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas.<br> ¿Ya sos cliente? Desplegá la <a id="btn-lista-clientes">lista de clientes</a> y cargá tus datos.`;
+
+    // Se dispara cuando se quiere desplegar la lista de clientes
+    generarListenerMostrarListaClientes();
+  
+    // Se dispara cuando se pretende completar datos
+    generarListenerMostrarDatosRegistro();
+  }
   if (localStorage.getItem("clienteLogueado") !== null) {
     completarDatosCliente(JSON.parse(localStorage.getItem("clienteLogueado")));
-    existenPropinas();
-  }
-  existenClientes();
+  } 
 }
 
 // Verifica si existen propinas asociadas a cliente y completa el historial de clientes
 function existenPropinas() {
-  if(localStorage.getItem("propinas") !== null) {
-    generarTituloYEncabezadoPropinas();
-    mostrarUltimasPropinas(JSON.parse(localStorage.getItem('propinas')));
+  if(localStorage.getItem("clienteLogueado") !== null) {
+    let clienteLogueado = JSON.parse(localStorage.getItem("clienteLogueado"));
+    if(!document.getElementById("tabla-propinas") && clienteLogueado.propinas.length > 0) {
+      generarTituloYEncabezadoPropinas();
+      mostrarUltimasPropinas(clienteLogueado.propinas);
+    }
   }
 }
 
@@ -600,14 +595,14 @@ function limpiarStorage() {
 function refrescar() {
   textoBienvenida.textContent = "¡Te damos la bienvenida!";
   if(clientes.length > 0) {
-    textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas.<br> ¿Ya sos cliente? Desplegá la <a id="lista-clientes">lista de clientes</a> y cargá tus datos.`;
+    textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas.<br> ¿Ya sos cliente? Desplegá la <a id="btn-lista-clientes">lista de clientes</a> y cargá tus datos.`;
+    generarListenerMostrarListaClientes();
   } else {
-    borrarTablaClientes();
     textoDatosPersonales.innerHTML = `<strong>* Opcional:</strong> podés <a id="registro-datos">registrar</a> tus datos, recordaremos tus últimas 5 propinas.`;
   }
-
-  // Se dispara cuando se pretende completar datos
-  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
+  borrarTablaClientes();
+  // Se dispara cuando se pretende completar datos de registro
+  generarListenerMostrarDatosRegistro();
 }
 
 // Suprime los ".00" de los números float
@@ -627,4 +622,21 @@ function validarNumeroEntero(valor) {
 
 function removerElemento(id) {
   document.getElementById(id).remove();
+}
+
+// --- Generadores de EventListener ---
+
+// Dispara un EventListener que se ejecuta cuando se hace clic sobre "anónima"
+function generarListenerBorrarHistorialYPropinas() {
+  document.getElementById("anonima").addEventListener("click", borrarDatosClienteYPropinas);
+}
+
+// Dispara un EventListener que se ejecuta cuando se hace clic sobre "tabla-clientes"
+function generarListenerMostrarListaClientes() {
+  document.getElementById("btn-lista-clientes").addEventListener("click", cargarListaClientes);
+}
+
+// Dispara un EventListener que se ejecuta cuando se hace clic sobre "registro-datos"
+function generarListenerMostrarDatosRegistro() {
+  document.getElementById("registro-datos").addEventListener("click", mostrarDatosRegistro);
 }

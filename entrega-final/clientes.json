@@ -3,7 +3,29 @@
     "nombre": "Julian",
     "apellido": "Alvarez",
     "dni": 40123,
-    "propinas": []
+    "propinas": [
+      {
+        "fecha": "16/02/2023 19:06:50",
+        "porcentajePropina": 10,
+        "cantidadPersonas": 1,
+        "totalPropina": "10",
+        "totalCuenta": 100,
+        "montosComensales": [
+          100
+        ]
+      },
+      {
+        "fecha": "16/02/2023 19:07:35",
+        "porcentajePropina": 20,
+        "cantidadPersonas": 2,
+        "totalPropina": "630.05",
+        "totalCuenta": 3150.25,
+        "montosComensales": [
+          1100,
+          2050.25
+        ]
+      }
+    ]
   },
   {
     "nombre": "Enzo",
